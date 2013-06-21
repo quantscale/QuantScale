@@ -1,0 +1,106 @@
+package quantscale.fdm.method
+import quantscale.fdm.TridiagonalMatrix
+import quantscale.fdm.payoff.FDPayoff
+import quantscale.fdm.ConstantLogBSM1FFDSpec
+import quantscale.fdm.Parabolic1DFDSpec
+
+/**
+ * Solves the log transformed problem: the space contains log(assetPrice)
+ */
+class TRBDF2CentralBSM1FMethod(payoff: FDPayoff = null) extends Parabolic1DMethod {
+
+  final val theta = 0.5;
+  final val alpha = 2 - Math.sqrt(2);
+  final val backcoeff = (1 - theta) * alpha;
+
+  private var tridiagonal: TridiagonalMatrix = null;
+  private var rhs: Array[Double] = null;
+  private var _spec: Parabolic1DFDSpec = null;
+  private var fTr: Array[Double] = null;
+  private var x: Array[Double] = null;
+  private var ex: Array[Double] = null;
+  private val frac = 1 / (alpha * (2 - alpha));
+
+  override def spec = _spec
+  
+  override def initSystem(specV: Parabolic1DFDSpec) {
+    _spec = specV
+    tridiagonal = new TridiagonalMatrix(spec.grid.spaceVector.size);
+    rhs = new Array[Double](spec.grid.spaceVector.size);
+    fTr = new Array[Double](spec.grid.spaceVector.size);
+    x = spec.grid.spaceVector;
+    ex = spec.grid.spaceTransform.transform(x);
+  }
+
+  def populateSystem(t: Double, dt: Double, f: Array[Double]) {
+    val beta = backcoeff * dt;
+    var j: Int = x.length - 2;
+
+    val isDriftSpaceDependent = spec.bIsStateDependent
+    val mu = if (isDriftSpaceDependent) 0.0 else spec.b(t, dt, 0);
+    val rC = if (spec.cIsStateDependent) 0.0 else -spec.c(t, dt,0);
+    while (j > 0) {
+      //TODO optimize
+      val exj = ex(j);
+      var variance = spec.a(t,dt,exj)*2
+      val dxj = x(j) - x(j - 1);
+      val dxjplus = x(j + 1) - x(j);
+      val muMod = if (isDriftSpaceDependent) spec.b(t, dt, exj) else mu
+      val r = if (spec.cIsStateDependent) -spec.c(t,dt,exj) else rC
+      if (smearingReducer != null) {
+        variance = smearingReducer.filter(variance, muMod, dxj, dxjplus)
+      }
+      tridiagonal.middle(j) = 1 + beta * (variance / (dxj * dxjplus) + r);
+      val betaTemp = beta / (dxj + dxjplus);
+      tridiagonal.lower(j) = betaTemp * (muMod - variance / dxj);
+      tridiagonal.upper(j) = -betaTemp * (muMod + variance / dxjplus);
+
+      val bStar = 1 - theta * alpha * dt * (variance / (dxj * dxjplus) + r);
+      rhs(j) = -tridiagonal.lower(j) * f(j - 1) + bStar * f(j) - tridiagonal.upper(j) * f(j + 1);
+      j -= 1;
+    }
+    val mu0 = if (spec.isInstanceOf[ConstantLogBSM1FFDSpec]) spec.b(t, dt, ex(0)) + spec.a(t, dt, ex(0)) else spec.b(t, dt, ex(0))
+    initLowerBoundary(t, dt, f, x, -spec.c(t,dt,ex(0)), mu0)
+    val muM = if (spec.isInstanceOf[ConstantLogBSM1FFDSpec]) spec.b(t, dt, ex(x.length - 1)) + spec.a(t, dt, ex(x.length -1)) else spec.b(t, dt, ex(x.length - 1))
+    initUpperBoundary(t, dt, f, x, -spec.c(t,dt,ex(ex.length-1)), muM)
+  }
+
+  def initLowerBoundary(t: Double, dt: Double, f: Array[Double], x: Array[Double], r: Double, mu: Double) {
+    val dx = x(1) - x(0);
+     val sign = -1 
+    tridiagonal.middle(0) = 1 - sign*backcoeff * dt * (r + mu / dx);
+    tridiagonal.upper(0) = sign*backcoeff * dt * mu / dx;
+    val rMiddle = 1 + sign*backcoeff * dt * (r + mu / dx);
+    rhs(0) = rMiddle * f(0) - tridiagonal.upper(0) * f(1);
+  }
+
+  def initUpperBoundary(t: Double, dt: Double, f: Array[Double], x: Array[Double], r: Double, mu: Double) {
+    val m = x.length - 1;
+    val dx = x(m) - x(m - 1);
+    val sign = -1
+    tridiagonal.middle(m) = 1 + sign * backcoeff * dt * (-r + mu / dx);
+    tridiagonal.lower(m) = -sign * backcoeff * dt * mu / dx;
+    val rMiddle = 1 - sign * backcoeff * dt * (-r + mu / dx);
+    rhs(m) = -tridiagonal.lower(m) * f(m - 1) + rMiddle * f(m);
+  }
+
+  def computeBDF2Rhs(price: Array[Double], prevPrice: Array[Double]) {
+    var i: Int = spec.grid.spaceSize - 1;
+    while (i >= 0) {
+      rhs(i) = frac * (price(i) - (1 - alpha) * (1 - alpha) * prevPrice(i));
+      i -= 1;
+    }
+  }
+
+  override def solve(currentTime: Double, dt: Double, f: Array[Double]) {
+    populateSystem(currentTime, dt, f);
+    if (payoff != null) payoff.setTime(currentTime + dt * alpha);
+
+    solver.solve(tridiagonal, rhs, fTr);
+    computeBDF2Rhs(fTr, f);
+    if (payoff != null) payoff.setTime(currentTime);
+
+    solver.solve(tridiagonal, rhs, f);
+  }
+
+}
