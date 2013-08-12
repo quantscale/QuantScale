@@ -188,7 +188,7 @@ class HaganSABRDensitySolver(spec: SABRModelSpec, forward: Double, T: Double, si
         while (strike > Fmin + (k) * h) {
           k += 1
         }
-        var term = (Fmin + k * h - strike)
+        val term = (Fmin + k * h - strike)
         var price = 0.5 * term * term * Q0_(k) + (Fmax - strike) * QR_
         k += 1
         while (k < size - 1) {
@@ -207,7 +207,7 @@ class HaganSABRDensitySolver(spec: SABRModelSpec, forward: Double, T: Double, si
         while (strike > Fmin + (k) * h) {
           k += 1
         }
-        var term = strike - Fmin - (k - 1) * h
+        val term = strike - Fmin - (k - 1) * h
         var price = 0.5 * term * term * Q0_(k) + (strike - Fmin) * QL_
         k -= 1
         while (k > 0) {

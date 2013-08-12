@@ -44,13 +44,13 @@ class HaganLawsonSwayneSABRDensitySolver(spec: SABRModelSpec, forward: Double, T
       QL_Half = QL_Full
       QR_Half = QR_Full
       // //check sum
-      //            var sum = QR_Half + QL_Half
-      //      var i = size - 2
-      //      while (i > 0) {
-      //        sum += h * Q1Half(i)
-      //        i -= 1
-      //      }
-      //      println("t=" + t + " LawsonSwayne-1 Q=" + sum)
+//                  var sum = QR_Half + QL_Half
+//            var i = size - 2
+//            while (i > 0) {
+//              sum += h * Q1Half(i)
+//              i -= 1
+//            }
+//            println("t=" + t + " LawsonSwayne-1 Q=" + sum+ "Q(f)="+Q1Half(j0)+" QL="+QL_Half+" QR="+QR_Half)
 
       //      t -= dt *b
       advance(dt*b, M1)

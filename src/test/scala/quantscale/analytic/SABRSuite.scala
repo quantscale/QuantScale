@@ -498,27 +498,30 @@ class SABRSuite extends FunSuite {
     val pde =
     //      new HaganTruncatedSABRDensitySolver(spec, forward, tte, 10000, 1000)
       new HaganLMG3SABRDensitySolver(spec, forward, tte, 10000, 10, 1000.0)
-
+    val pdeTransformed = new HaganSABRTransformedDensitySolver(spec,forward,tte,1000,100,3)
+    pdeTransformed.useRannacher = true
     val volHagan = 100 * SABRVanilla.impliedVolatilityHagan(spec, forward, K, tte)
     val volAHShort = 100 * SABRVanilla.impliedVolatilityAndreasenHuge(spec, forward, K, tte)
     val priceAH = splinePut.value(K)
     val priceAHRaw = splinePutRaw.value(K)
     val pricePDE = pde.price(false, K)
+    val pricePDET = pdeTransformed.price(false, K)
     val normalVol = SABRVanilla.normalVolatilityHagan2013(spec, forward, K, tte)
     val normalPrice = BachelierVanillaEuropean.price(true, K, forward, normalVol, tte)
     //    val volNormal = 100*solver.impliedVolatility(true, K, normalPrice, forward, df, tte)
     val volAH = 100 * solver.impliedVolatility(false, K, priceAH, forward, df, tte)
     val volAHRaw = 100 * solver.impliedVolatility(false, K, priceAHRaw, forward, df, tte)
     val volPDE = 100 * solver.impliedVolatility(false, K, pricePDE, forward, df, tte)
-
+    val volPDET = 100 * solver.impliedVolatility(false, K, pricePDET, forward, df, tte)
     val priceBen = SABRVanilla.priceBenhamou(spec, true, K, forward, tte) + K - forward
-    println(BlackScholesVanillaEuropean.priceEuropeanVanilla(true, K, forward, volHagan * volHagan * tte, 1.0, df))
-    println(pricePDE)
+    println("BS   " + BlackScholesVanillaEuropean.priceEuropeanVanilla(true, K, forward, volHagan * volHagan * tte, 1.0, df))
+    println("PDE  " + pricePDE)
+    println("PDET " + pricePDET)
     println(priceBen)
     println(normalPrice)
     val volBen = Double.NaN //100* solver.impliedVolatility(false, K, priceBen, forward, df, tte)
 
-    println(f"$volHagan%2.3f $volBen%2.3f $volAHShort%2.3f $volAH%2.3f $volPDE%2.3f")
+    println(f"$volHagan%2.3f $volBen%2.3f $volAHShort%2.3f $volAH%2.3f $volPDE%2.3f $volPDET%2.3f")
   }
 
   def computeMaxError(solver: HaganSABRDensitySolver, strikes: Array[Double], forward: Double, tte: Double, refSolver: HaganSABRDensitySolver): Double = {
@@ -544,7 +547,7 @@ class SABRSuite extends FunSuite {
 
     for (i <- 1 until F.size - 2) {
       val Qref = Qspline.value(F(i))
-      var error = Q0(i) - Qref
+      var error = (Q0(i) - Qref)
       if (error < 0) error = -error
       if (error > maxError) {
         maxError = error
@@ -566,7 +569,7 @@ class SABRSuite extends FunSuite {
     val spec = new SABRModelSpec(alpha, beta, nu, rho)
     val FmaxTruncation = 5.0 * forward
 
-    val refPDE = new HaganLMG3SABRDensitySolver(spec, forward, tte, 1280*4, 1280 * 4, FmaxTruncation)
+    val refPDE = new HaganLMG3SABRDensitySolver(spec, forward, tte, 500, 1280 * 4, FmaxTruncation)
 
     refPDE.solve()
     println("courant=" + refPDE.computeCourantNumber)
@@ -717,15 +720,15 @@ class SABRSuite extends FunSuite {
     val strikes = new UniformMesh1D(100, new Mesh1DBoundaries(forward * 0.2, forward * 2)).x
 
     var isCall = false
-    val refPDE = new HaganLMG3SABRDensitySolver(spec, forward, tte, 500, 1280 * 4, FmaxTruncation)
+    val refPDE = new HaganLMG3SABRDensitySolver(spec, forward, tte, 1280*4, 1280 * 4, FmaxTruncation)
 
     refPDE.solve()
     val Qspline = CubicSpline.makeCubicSpline(refPDE.F, refPDE.Q0)
 
     var solver = new Li2011SORDRBlackVolatilitySolver(1e-12)
-    val schemes = Array("CN", "RAN", "LMG2", "LMG3", "LS", "TRBDF2", "CNBDF3", "RE")
+    val schemes = Array("CN", "RAN", "LMG2", "LMG3", "LS", "TRBDF2", "TRBDF3", "RE")
     val spaceSteps = Array(500) // Array(80, 160, 320, 640, 1280)
-    val timeSteps = Array(2, 5, 10, 20, 40, 80, 160, 320, 640, 1280)
+    val timeSteps = Array(1,2,3,4, 5,6,7,8,9, 10, 20, 40, 80, 160, 320, 640, 1280)
     for (l <- 0 to 9) {
       //            println("SpaceSteps TimeSteps Scheme MaxError FError Time")
       println("SpaceSteps & TimeSteps & Scheme & MaxError & Time\\\\")
@@ -762,15 +765,15 @@ class SABRSuite extends FunSuite {
     val strikes = new UniformMesh1D(100, new Mesh1DBoundaries(forward * 0.2, forward * 2)).x
 
     var isCall = false
-    val refPDE = new HaganSABRDensitySolver(spec, forward, tte, 1280 * 4, 1280 * 64, FmaxTruncation)
+    val refPDE = new HaganLMG3SABRDensitySolver(spec, forward, tte, 1280 * 4, 1280 * 4, FmaxTruncation)
 
     refPDE.solve()
     var solver = new Li2011SORDRBlackVolatilitySolver(1e-12)
 
     val spaceSteps = Array(500) // Array(80, 160, 320, 640, 1280)
-    val timeSteps = Array(2, 5, 10, 20, 40, 80, 160, 320, 640, 1280)
-    val schemes = Array("CN", "RAN", "LMG2", "LMG3", "LS", "TRBDF2", "RE")
-    for (l <- 0 until 5) {
+    val timeSteps = Array(1, 2, 3, 4, 5, 6,7,8,9, 10, 20, 40, 80, 160, 320, 640, 1280)
+    val schemes = Array("CN", "RAN", "LMG2", "LMG3", "LS", "TRBDF2", "TRBDF3", "RE")
+    for (l <- 0 until 9) {
       println("SpaceSteps TimeSteps Scheme MaxError Time")
       for (spaceStep <- spaceSteps) {
         var buffer = ""
@@ -1095,33 +1098,46 @@ class SABRSuite extends FunSuite {
     val xSteps = 500
     val tSteps = 5
     val FmaxTruncation = 5 * forward
+    val nDeviation = 3.0
     val spec = new SABRModelSpec(alpha, beta, nu, rho)
     var pde = new HaganSABRDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
     pde.useSmoothing = false
     pde.useRannacher = false
+    //var pdeMap = Map("LS" -> new HaganLawsonSwayneSABRDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation))
     var pdeMap = Map("CN" -> pde)
     pde = new HaganSABRDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
     pde.useSmoothing = false
     pde.useRannacher = true
     pdeMap += "RAN" -> pde
-    pdeMap += "LMG2" -> new HaganLMG2SABRDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
-    pdeMap += "LMG3" -> new HaganLMG3SABRDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
-    pdeMap += "LS" -> new HaganLawsonSwayneSABRDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
-    pdeMap += "TRBDF2" -> new HaganTRBDF2SABRDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
-    pdeMap += "RE" -> new HaganRichardsonEulerSABRDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
-    pdeMap += "ADE" -> new HaganADESABRDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
-    println("Scheme & h & Q(f) & QL & QR\\\\")
+
+
+    //pdeMap += "LMG2" -> new HaganLMG2SABRDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
+    //pdeMap += "LMG3" -> new HaganLMG3SABRDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
+    //pdeMap += "LS" -> new HaganLawsonSwayneSABRDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
+    //pdeMap += "TRBDF2" -> new HaganTRBDF2SABRDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
+    //pdeMap += "RE" -> new HaganRichardsonEulerSABRDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
+   // pdeMap += "ADE" -> new HaganADESABRDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
+    //pdeMap += "TRBDF3" -> new HaganCNBDF3SABRDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
+    val h = pde.h
+    val dt = pde.dt
+    println(f"h=$h%2.12f")
+    println(f"dt=$dt%2.12f")
+    println("Scheme & ATM price & Q(f) & QL & QR\\\\")
+    for (i <- 0 until 100) {
+      val startTime = System.nanoTime()
     for ((name, pde) <- pdeMap) {
       pde.solve()
-      val h = pde.h
       val j0 = pde.indexForward
       val Qforward = pde.Q0(j0)
       val QL = pde.QL
       val QR = pde.QR
-      val dt = pde.dt
-      println(f"$name & $h%2.12f & $dt%2.12f & $Qforward%2.12f & $QL%2.12f & $QR%2.12f\\\\")
+
+      val price = pde.price(false,forward)
+      println(f"$name & $price%2.12f & $Qforward%2.12f & $QL%2.12f & $QR%2.12f\\\\")
 
       //      println(f"$name & $h%2.12f & $Qforward%2.12f & $QL%2.12f & $QR%2.12f\\\\")
+    }
+      println("elapsed "+(System.nanoTime()-startTime)*1e-9)
     }
 
   }
