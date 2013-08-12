@@ -6,7 +6,7 @@ import quantscale.fdm.ThomasTridiagonalSolver
 import quantscale.fdm.Epsilon
 import quantscale.analytic.SABRVanilla
 
-class HaganSABRDensitySolver(spec: SABRModelSpec, forward: Double, T: Double, size: Int = 1000, timeSteps: Int = 1000 / 5, FmaxTruncation: Double = 5.0) {
+class HaganSABRDensitySolver(spec: SABRModelSpec, forward: Double, T: Double, size: Int = 1000, timeSteps: Int = 1000 / 5, FmaxTruncation: Double = 5.0) extends SABRDensitySolver {
   private[sabr] var M0, M1: Array[Double] = null
   private[sabr] var Q0_, Q1: Array[Double] = null
   private[sabr] var Fmin = spec.b

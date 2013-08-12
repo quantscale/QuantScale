@@ -5,15 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d7b992c4-8484-4e1f-bd9b-b629a460f079" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganLawsonSwayneSABRTransformedDensitySolver.scala" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganSABRTransformedDensitySolver.scala" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/test/scala/quantscale/analytic/TransformedSABRSuite.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganCNBDF3SABRDensitySolver.scala" afterPath="$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganCNBDF3SABRDensitySolver.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganLawsonSwayneSABRDensitySolver.scala" afterPath="$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganLawsonSwayneSABRDensitySolver.scala" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganLMG3SABRTransformedDensitySolver.scala" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/SABRDensitySolver.scala" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganSABRDensitySolver.scala" afterPath="$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganSABRDensitySolver.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganTRBDF2SABRDensitySolver.scala" afterPath="$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganTRBDF2SABRDensitySolver.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/scala/quantscale/analytic/SABRSuite.scala" afterPath="$PROJECT_DIR$/src/test/scala/quantscale/analytic/SABRSuite.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/vcs.xml" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganSABRTransformedDensitySolver.scala" afterPath="$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganSABRTransformedDensitySolver.scala" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/scala/quantscale/analytic/TransformedSABRSuite.scala" afterPath="$PROJECT_DIR$/src/test/scala/quantscale/analytic/TransformedSABRSuite.scala" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="QuantScale.iws" />
@@ -26,13 +22,14 @@
     <file path="/HaganTRBDF2SABRDensitySolver.scala" changelist="d7b992c4-8484-4e1f-bd9b-b629a460f079" time="1371813420497" ignored="false" />
     <file path="/HaganSABRDensitySolver.scala" changelist="d7b992c4-8484-4e1f-bd9b-b629a460f079" time="1375105423449" ignored="false" />
     <file path="/HaganADESABRDensitySolver.scala" changelist="d7b992c4-8484-4e1f-bd9b-b629a460f079" time="1371831044292" ignored="false" />
-    <file path="/Dummy.txt" changelist="d7b992c4-8484-4e1f-bd9b-b629a460f079" time="1376295379460" ignored="false" />
+    <file path="/Dummy.txt" changelist="d7b992c4-8484-4e1f-bd9b-b629a460f079" time="1376340483581" ignored="false" />
     <file path="/HaganLawsonSwayneSABRDensitySolver.scala" changelist="d7b992c4-8484-4e1f-bd9b-b629a460f079" time="1375104419851" ignored="false" />
     <file path="/HaganSABRTransformedDensitySolver.scala" changelist="d7b992c4-8484-4e1f-bd9b-b629a460f079" time="1376326333311" ignored="false" />
-    <file path="/TransformedSABRSuite.scala" changelist="d7b992c4-8484-4e1f-bd9b-b629a460f079" time="1376327212390" ignored="false" />
+    <file path="/TransformedSABRSuite.scala" changelist="d7b992c4-8484-4e1f-bd9b-b629a460f079" time="1376340834054" ignored="false" />
     <file path="/fragment.java" changelist="d7b992c4-8484-4e1f-bd9b-b629a460f079" time="1376322494266" ignored="false" />
     <file path="/HaganLawsonSwayneTransformedSABRDensitySolver.scala" changelist="d7b992c4-8484-4e1f-bd9b-b629a460f079" time="1376327689522" ignored="false" />
     <file path="/HaganLawsonSwayneSABRTransformedDensitySolver.scala" changelist="d7b992c4-8484-4e1f-bd9b-b629a460f079" time="1376326816992" ignored="false" />
+    <file path="/HaganLMG3SABRTransformedDensitySolver.scala" changelist="d7b992c4-8484-4e1f-bd9b-b629a460f079" time="1376340885805" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -167,21 +164,28 @@
       <file leaf-file-name="TransformedSABRSuite.scala" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/test/scala/quantscale/analytic/TransformedSABRSuite.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="32" column="42" selection-start="1331" selection-end="1331" vertical-scroll-proportion="0.0">
+            <state line="31" column="45" selection-start="1264" selection-end="1264" vertical-scroll-proportion="0.0">
               <folding>
-                <element signature="e#29#162#0" expanded="true" />
+                <element signature="e#29#201#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="HaganLawsonSwayneSABRTransformedDensitySolver.scala" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="HaganLMG3SABRTransformedDensitySolver.scala" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganLMG3SABRTransformedDensitySolver.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="110" column="16" selection-start="3716" selection-end="3716" vertical-scroll-proportion="0.4358407">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="HaganLawsonSwayneSABRTransformedDensitySolver.scala" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganLawsonSwayneSABRTransformedDensitySolver.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="76" column="8" selection-start="2609" selection-end="2609" vertical-scroll-proportion="0.38495576">
-              <folding>
-                <element signature="e#29#69#0" expanded="true" />
-              </folding>
+            <state line="86" column="34" selection-start="2787" selection-end="2787" vertical-scroll-proportion="0.0">
+              <folding />
             </state>
           </provider>
         </entry>
@@ -189,10 +193,8 @@
       <file leaf-file-name="HaganSABRTransformedDensitySolver.scala" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganSABRTransformedDensitySolver.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="120" column="6" selection-start="3488" selection-end="3488" vertical-scroll-proportion="0.0">
-              <folding>
-                <element signature="e#29#71#0" expanded="true" />
-              </folding>
+            <state line="120" column="6" selection-start="3514" selection-end="3514" vertical-scroll-proportion="0.0">
+              <folding />
             </state>
           </provider>
         </entry>
@@ -227,8 +229,9 @@
         <option value="$PROJECT_DIR$/src/test/scala/quantscale/analytic/SABRSuite.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganSABRTransformedDensitySolver.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganLawsonSwayneTransformedSABRDensitySolver.scala" />
-        <option value="$PROJECT_DIR$/src/test/scala/quantscale/analytic/TransformedSABRSuite.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganLawsonSwayneSABRTransformedDensitySolver.scala" />
+        <option value="$PROJECT_DIR$/src/test/scala/quantscale/analytic/TransformedSABRSuite.scala" />
+        <option value="$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganLMG3SABRTransformedDensitySolver.scala" />
       </list>
     </option>
   </component>
@@ -265,6 +268,7 @@
     </navigator>
     <panes>
       <pane id="Scope" />
+      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -479,7 +483,6 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -495,9 +498,9 @@
     <property name="GoToClass.toSaveIncludeLibraries" value="false" />
     <property name="MemberChooser.showClasses" value="true" />
     <property name="GoToClass.includeLibraries" value="false" />
-    <property name="options.searchVisible" value="true" />
-    <property name="options.splitter.details.proportions" value="0.2" />
     <property name="dynamic.classpath" value="false" />
+    <property name="options.splitter.details.proportions" value="0.2" />
+    <property name="options.searchVisible" value="true" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -612,19 +615,6 @@
       <option name="PORT" value="5005" />
       <method />
     </configuration>
-    <configuration default="true" type="Applet" factoryName="Applet">
-      <module name="" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="HTML_FILE_NAME" />
-      <option name="HTML_USED" value="false" />
-      <option name="WIDTH" value="400" />
-      <option name="HEIGHT" value="300" />
-      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
-      <option name="VM_PARAMETERS" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <method />
-    </configuration>
     <configuration default="true" type="TestNG" factoryName="TestNG">
       <module name="" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
@@ -650,6 +640,19 @@
       <envs />
       <properties />
       <listeners />
+      <method />
+    </configuration>
+    <configuration default="true" type="Applet" factoryName="Applet">
+      <module name="" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="HTML_FILE_NAME" />
+      <option name="HTML_USED" value="false" />
+      <option name="WIDTH" value="400" />
+      <option name="HEIGHT" value="300" />
+      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
+      <option name="VM_PARAMETERS" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
       <method />
     </configuration>
     <configuration default="true" type="Application" factoryName="Application">
@@ -858,11 +861,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganLMG3SABRDensitySolver.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="6" column="6" selection-start="147" selection-end="147" vertical-scroll-proportion="-0.42785236" />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/quantscale/vol/BlackVolatilitySolver.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state line="106" column="6" selection-start="4148" selection-end="4148" vertical-scroll-proportion="0.33215547" />
@@ -937,30 +935,33 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/scala/quantscale/analytic/TransformedSABRSuite.scala">
+    <entry file="file://$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganLawsonSwayneSABRTransformedDensitySolver.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="32" column="42" selection-start="1331" selection-end="1331" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="e#29#162#0" expanded="true" />
-          </folding>
+        <state line="86" column="34" selection-start="2787" selection-end="2787" vertical-scroll-proportion="0.0">
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganSABRTransformedDensitySolver.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="120" column="6" selection-start="3488" selection-end="3488" vertical-scroll-proportion="0.0">
+        <state line="120" column="6" selection-start="3514" selection-end="3514" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/scala/quantscale/analytic/TransformedSABRSuite.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="31" column="45" selection-start="1264" selection-end="1264" vertical-scroll-proportion="0.0">
           <folding>
-            <element signature="e#29#71#0" expanded="true" />
+            <element signature="e#29#201#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganLawsonSwayneSABRTransformedDensitySolver.scala">
+    <entry file="file://$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganLMG3SABRTransformedDensitySolver.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="76" column="8" selection-start="2609" selection-end="2609" vertical-scroll-proportion="0.38495576">
-          <folding>
-            <element signature="e#29#69#0" expanded="true" />
-          </folding>
+        <state line="110" column="16" selection-start="3716" selection-end="3716" vertical-scroll-proportion="0.4358407">
+          <folding />
         </state>
       </provider>
     </entry>

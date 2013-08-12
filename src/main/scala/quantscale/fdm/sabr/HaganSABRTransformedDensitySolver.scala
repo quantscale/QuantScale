@@ -7,7 +7,7 @@ import scala.Array
 /**
  * Date: 8/12/13
  */
-class HaganSABRTransformedDensitySolver(spec: SABRModelSpec, forward: Double, T: Double, size: Int = 1000, timeSteps: Int = 1000 / 5, nDeviations: Double = 3.0) {
+class HaganSABRTransformedDensitySolver(spec: SABRModelSpec, forward: Double, T: Double, size: Int = 1000, timeSteps: Int = 1000 / 5, nDeviations: Double = 3.0) extends SABRDensitySolver {
   private[sabr] var Q0_, Q1: Array[Double] = null
   private[sabr] var Fmin = spec.b
   private[sabr] var Fmax = 0.0

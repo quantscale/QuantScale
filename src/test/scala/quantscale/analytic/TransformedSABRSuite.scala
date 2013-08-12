@@ -1,6 +1,6 @@
 package quantscale.analytic
 
-import quantscale.fdm.sabr.{HaganLawsonSwayneSABRTransformedDensitySolver, HaganSABRTransformedDensitySolver, HaganSABRDensitySolver}
+import quantscale.fdm.sabr.{HaganLMG3SABRTransformedDensitySolver, HaganLawsonSwayneSABRTransformedDensitySolver, HaganSABRTransformedDensitySolver, HaganSABRDensitySolver}
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.FunSuite
@@ -29,7 +29,7 @@ class TransformedSABRSuite extends FunSuite {
 
 
     //pdeMap += "LMG2" -> new HaganLMG2SABRDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
-    //pdeMap += "LMG3" -> new HaganLMG3SABRDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
+    pdeMap += "LMG3" -> new HaganLMG3SABRTransformedDensitySolver(spec, forward, tte, xSteps, tSteps, nDeviation)
     pdeMap += "LS" -> new HaganLawsonSwayneSABRTransformedDensitySolver(spec, forward, tte, xSteps, tSteps, nDeviation)
     //pdeMap += "TRBDF2" -> new HaganTRBDF2SABRDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
     //pdeMap += "RE" -> new HaganRichardsonEulerSABRDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
@@ -53,10 +53,11 @@ class TransformedSABRSuite extends FunSuite {
         val price = pde.price(false,forward)
         println(f"$name & $price%2.12f & $Qforward%2.12f & $QL%2.12f & $QR%2.12f\\\\")
 
-        //      println(f"$name & $h%2.12f & $Qforward%2.12f & $QL%2.12f & $QR%2.12f\\\\")
+        // println(f"$name & $h%2.12f & $Qforward%2.12f & $QL%2.12f & $QR%2.12f\\\\")
       }
       println("elapsed "+(System.nanoTime()-startTime)*1e-9)
     }
 
   }
 }
+
