@@ -28,6 +28,8 @@ class HaganSABRTransformedDensitySolver(spec: SABRModelSpec, forward: Double, T:
 
   initGrid()
 
+  def name = if (useRannacher) "RAN" else "CN"
+
   def h: Double = h_
 
   def Q0: Array[Double] = Q0_
@@ -50,6 +52,14 @@ class HaganSABRTransformedDensitySolver(spec: SABRModelSpec, forward: Double, T:
     println(str)
   }
 
+  private[sabr] def computedQLdt(Em: Array[Double], P: Array[Double]) : Double = {
+    return Cm_(1) / (Fm_(1) - Fm_(0)) * Em(1) * P(1)
+  }
+
+  private[sabr] def computedQRdt(Em: Array[Double], P: Array[Double]) : Double = {
+    return Cm_(size - 2) / (Fm_(size - 1) - Fm_(size - 2)) * Em(size - 2) * P(size - 2)
+  }
+
   def solve() {
 
     tri1 = new TridiagonalMatrix(size)
@@ -66,7 +76,7 @@ class HaganSABRTransformedDensitySolver(spec: SABRModelSpec, forward: Double, T:
     QR_ = 0.0
     var t = T
     var indexRannacher = 0
-    var rhs = Array.ofDim[Double](size)
+    val rhs = Array.ofDim[Double](size)
     var tIndex = 0
 
     while (tIndex < timeSteps) {
@@ -77,7 +87,7 @@ class HaganSABRTransformedDensitySolver(spec: SABRModelSpec, forward: Double, T:
       if (useRannacher && indexRannacher < 2) {
         t -= dt / 2
         advanceEm(dt / 2, Em_)
-        computeSystem(dt, Em_, null) //will use dt/2 because of Crank
+        computeSystem(dt, Em_, null, tri1, tri0) //will use dt/2 because of Crank
         Q0_(0) = 0
         Q0_(size - 1) = 0
         solver.solve(tri1, Q0_, Q1)
@@ -88,18 +98,18 @@ class HaganSABRTransformedDensitySolver(spec: SABRModelSpec, forward: Double, T:
         Q1 = Qtmp
         t -= dt / 2
         advanceEm(dt / 2, Em_)
-        computeSystem(dt, Em_, null) //will use dt/2 because of Crank
+        computeSystem(dt, Em_, null, tri1, tri0) //will use dt/2 because of Crank
         Q0_(0) = 0
         Q0_(size - 1) = 0
         solver.solve(tri1, Q0_, Q1)
-        QL_ += dt/2 * Cm_(1) / (Fm_(1) - Fm_(0)) * Em_(1) * Q1(1)
-        QR_ += dt/2 * Cm_(size - 2) / (Fm_(size - 1) - Fm_(size - 2)) * Em_(size - 2) * Q1(size - 2)
+        QL_ += dt/2 * computedQLdt(Em_, Q1)
+        QR_ += dt/2 * computedQRdt(Em_, Q1)
         indexRannacher += 1
       } else {
         t -= dt
         Array.copy(Em_, 0, M0, 0, size)
         advanceEm(dt, Em_)
-        computeSystem(dt, Em_, M0)
+        computeSystem(dt, Em_, M0, tri1, tri0)
         Q0_(0) = 0
         Q0_(size - 1) = 0
         tri0.multiply(Q0_, rhs)
@@ -118,16 +128,16 @@ class HaganSABRTransformedDensitySolver(spec: SABRModelSpec, forward: Double, T:
   }
 
 
-  def printSumQF(t: Double) {
-    var sumQ = QR_ + QL_
-    var sumF = Fmin * QL_ + Fmax * QR_
+  def printSumQF(name: String, t: Double, Q1 : Array[Double], QL: Double, QR: Double) {
+    var sumQ = QR + QL
+    var sumF = Fmin * QL + Fmax * QR
     var i = size - 2
     while (i > 0) {
       sumQ += h * Q1(i)
       sumF += h * Q1(i) * Fm_(i)
       i -= 1
     }
-    println("t=" + t + " CN Q=" + sumQ + " F=" + sumF + " Fj0=" + Fm_(j0) + " QL_=" + QL_ + " QR_=" + QR_)
+    println("t=" + t + " "+name+" Q=" + sumQ + " F=" + sumF + " Fj0=" + Fm_(j0) + " QL_=" + QL + " QR_=" + QR)
   }
 
   def price(isCall: Boolean, strike: Double): Double = {
@@ -181,7 +191,26 @@ class HaganSABRTransformedDensitySolver(spec: SABRModelSpec, forward: Double, T:
     }
   }
 
-  private[sabr] def computeSystem(dt: Double, M1: Array[Double], M0: Array[Double]) {
+  private[sabr] def computeSystem(dt: Double, M1: Array[Double], tri1: TridiagonalMatrix) {
+
+    var j = 1
+    val frac = dt / (2*h)
+    while (j < size - 1) {
+      val a = Cm_(j - 1) / (Fm_(j) - Fm_(j - 1));
+      val b = Cm_(j) * (1 / (Fm_(j + 1) - Fm_(j)) + 1 / (Fm_(j) - Fm_(j - 1)))
+      val c = Cm_(j + 1) / (Fm_(j + 1) - Fm_(j));
+      tri1.lower(j) = -a * frac * M1(j - 1)
+      tri1.middle(j) = 1 + b * frac * M1(j)
+      tri1.upper(j) = -c * frac * M1(j + 1)
+      j += 1
+    }
+    tri1.upper(0) = Cm_(1) / (Fm_(1) - Fm_(0)) * M1(1)
+    tri1.middle(0) = Cm_(0) / (Fm_(1) - Fm_(0)) * M1(0)
+    tri1.lower(size - 1) = Cm_(size - 2) / (Fm_(size - 1) - Fm_(size - 2)) * M1(size - 2)
+    tri1.middle(size - 1) = Cm_(size - 1) / (Fm_(size - 1) - Fm_(size - 2)) * M1(size - 1)
+  }
+
+  private[sabr] def computeSystem(dt: Double, M1: Array[Double], M0: Array[Double], tri1: TridiagonalMatrix, tri0: TridiagonalMatrix) {
 
     var j = 1
     val frac = dt / (4 * h)
@@ -291,8 +320,8 @@ class HaganSABRTransformedDensitySolver(spec: SABRModelSpec, forward: Double, T:
       }
     }
     var j = 0
-    var zm = Array.ofDim[Double](size)
-    var h0 = (zmax - zmin) / size
+    val zm = Array.ofDim[Double](size)
+    val h0 = (zmax - zmin) / size
     j0 = (((0.0 - zmin) / h0)).toInt
     h_ = (0.0 - zmin) / (j0 - 0.5)
     while (j < size) {

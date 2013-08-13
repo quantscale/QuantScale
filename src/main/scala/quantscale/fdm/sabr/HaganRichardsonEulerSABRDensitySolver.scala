@@ -10,20 +10,18 @@ class HaganRichardsonEulerSABRDensitySolver(spec: SABRModelSpec, forward: Double
   override def solve() {
     val Q1full = Array.ofDim[Double](size)
     solve(dt_)
-    System.arraycopy(Q1, 0, Q1full, 0, size)
+    System.arraycopy(Q0_, 0, Q1full, 0, size)
     val QL_full = QL_
     val QR_full = QR_
     dt_ = dt_ / 2
     solve(dt_)
     var i = 0
     while (i < size) {
-      Q1(i) = 2 * Q1(i) - Q1full(i)
+      Q0_(i) = 2 * Q0_(i) - Q1full(i)
       i += 1
     }
     dt_ = dt_ * 2
-    val Qtmp = Q0_
-    Q0_ = Q1
-    Q1 = Qtmp
+
     QL_ = 2 * QL_ - QL_full
     QR_ = 2 * QR_ - QR_full
   }

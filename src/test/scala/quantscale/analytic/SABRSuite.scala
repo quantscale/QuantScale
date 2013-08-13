@@ -19,7 +19,45 @@ import quantscale.fdm.Epsilon
 
 @RunWith(classOf[JUnitRunner])
 class SABRSuite extends FunSuite {
+  test("put-call-parity") {
+    val alpha = 0.35;
+    val nu = 1.0;
+    val beta = 0.25;
+    val rho = -0.1;
+    val forward = 1.0;
+    val tte = 1.0;
+    val df = 1.0
+    val xSteps = 500
+    val tSteps = 10
+    val nDeviation = 3.0
+    val spec = new SABRModelSpec(alpha, beta, nu, rho)
+    var pde = new HaganSABRDensitySolver(spec, forward, tte, xSteps, tSteps, nDeviation)
+    pde.useRannacher = false
+    //var pdeMap = Map("LS" -> new HaganLawsonSwayneSABRDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation))
+    var pdeMap = Map("CN" -> pde)
+    pde = new HaganSABRDensitySolver(spec, forward, tte, xSteps, tSteps, nDeviation)
+    pde.useRannacher = true
+    pdeMap += "RAN" -> pde
 
+
+    pdeMap += "LMG2" -> new HaganLMG2SABRDensitySolver(spec, forward, tte, xSteps, tSteps, nDeviation)
+    pdeMap += "LMG3" -> new HaganLMG3SABRDensitySolver(spec, forward, tte, xSteps, tSteps, nDeviation)
+    pdeMap += "LS" -> new HaganLawsonSwayneSABRDensitySolver(spec, forward, tte, xSteps, tSteps, nDeviation)
+    pdeMap += "TRBDF2" -> new HaganTRBDF2SABRDensitySolver(spec, forward, tte, xSteps, tSteps, nDeviation)
+    pdeMap += "RE" -> new HaganRichardsonEulerSABRDensitySolver(spec, forward, tte, xSteps, tSteps, nDeviation)
+    // pdeMap += "ADE" -> new HaganADESABRDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
+    pdeMap += "TRBDF3" -> new HaganCNBDF3SABRDensitySolver(spec, forward, tte, xSteps, tSteps, nDeviation)
+
+    for ((name, pde) <- pdeMap) {
+      pde.solve()
+      val pricePut = pde.price(false,forward)
+      val priceCall = pde.price(true, forward)
+      println(name+" "+pricePut+" "+priceCall)
+      assert(pricePut-priceCall < 1e-8, "put="+pricePut+" call="+priceCall)
+
+      // println(f"$name & $h%2.12f & $Qforward%2.12f & $QL%2.12f & $QR%2.12f\\\\")
+    }
+  }
   test("li-sordr-iv") {
     val forward = 100.0
     val strikes = Array(0.2 * forward, 0.5 * forward, 0.9 * forward, 1.0 * forward, 1.1 * forward, 1.5 * forward)
@@ -1360,7 +1398,7 @@ class SABRSuite extends FunSuite {
     var value = 0.0
     for (i <- 1 until F.size - 2) {
       if (Qold != null) {
-        var error = Q(i) - Qold(i)
+        val error = Q(i) - Qold(i)
         if (math.abs(error) > maxError) {
           maxError = error
           Fmax = F(i)

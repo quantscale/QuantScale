@@ -36,8 +36,8 @@ class HaganLawsonSwayneSABRTransformedDensitySolver (spec: SABRModelSpec, forwar
       Q0_(0) = 0
       Q0_(size - 1) = 0
       solver.solve(tri1, Q0_, Q1Half)
-      QL_Full = QL_ + dt * b *  Cm_(1) / (Fm_(1) - Fm_(0)) * Em_(1) * Q1Half(1)
-      QR_Full = QR_ + dt * b * Cm_(size - 2) / (Fm_(size - 1) - Fm_(size - 2)) * Em_(size - 2) * Q1Half(size - 2)
+      QL_Full = QL_ + dt * b * computedQLdt(Em_, Q1Half)
+      QR_Full = QR_ + dt * b * computedQRdt(Em_, Q1Half)
       QL_Half = QL_Full
       QR_Half = QR_Full
       // //check sum
@@ -55,8 +55,8 @@ class HaganLawsonSwayneSABRTransformedDensitySolver (spec: SABRModelSpec, forwar
       Q1Half(0) = 0
       Q1Half(size - 1) = 0
       solver.solve(tri1, Q1Half, Q1)
-      QL_Full += dt * b *  Cm_(1) / (Fm_(1) - Fm_(0)) * Em_(1) * Q1(1)
-      QR_Full += dt * b * Cm_(size - 2) / (Fm_(size - 1) - Fm_(size - 2)) * Em_(size - 2) * Q1(size - 2)
+      QL_Full += dt * b * computedQLdt(Em_, Q1)
+      QR_Full += dt * b * computedQRdt(Em_, Q1)
 
       //      sum = QR_Full + QL_Full
       //      i = size - 2
@@ -83,22 +83,4 @@ class HaganLawsonSwayneSABRTransformedDensitySolver (spec: SABRModelSpec, forwar
 
   }
 
-  private def computeSystem(dt: Double, M1: Array[Double], tri1: TridiagonalMatrix) {
-
-    var j = 1
-    val frac = dt / (2*h)
-    while (j < size - 1) {
-      val a = Cm_(j - 1) / (Fm_(j) - Fm_(j - 1));
-      val b = Cm_(j) * (1 / (Fm_(j + 1) - Fm_(j)) + 1 / (Fm_(j) - Fm_(j - 1)))
-      val c = Cm_(j + 1) / (Fm_(j + 1) - Fm_(j));
-      tri1.lower(j) = -a * frac * M1(j - 1)
-      tri1.middle(j) = 1 + b * frac * M1(j)
-      tri1.upper(j) = -c * frac * M1(j + 1)
-      j += 1
-    }
-    tri1.upper(0) = Cm_(1) / (Fm_(1) - Fm_(0)) * M1(1)
-    tri1.middle(0) = Cm_(0) / (Fm_(1) - Fm_(0)) * M1(0)
-    tri1.lower(size - 1) = Cm_(size - 2) / (Fm_(size - 1) - Fm_(size - 2)) * M1(size - 2)
-    tri1.middle(size - 1) = Cm_(size - 1) / (Fm_(size - 1) - Fm_(size - 2)) * M1(size - 1)
-  }
 }

@@ -3,21 +3,13 @@ package test.quantscale.math
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
-import quantscale.analytic.CodyCND
-import quantscale.analytic.HartCND
-import quantscale.analytic.SchonfelderCND
-import quantscale.analytic.HillAS66CND
+import quantscale.analytic._
 import quantscale.math.CumulativeBivariateNormalDistribution
 import quantscale.math.GenzWestLeFlochBVD
 import quantscale.math.GenzWestBVD
-import quantscale.analytic.BlackScholesMertonBarrier
-import quantscale.analytic.DeltaGreek
 import quantscale.analytic.Price
-import quantscale.analytic.BSMMeasure
+import quantscale.analytic.DeltaGreek
 import quantscale.analytic.GammaGreek
-import quantscale.analytic.OouraCND
-import quantscale.analytic.CodyInlinedCND
-import quantscale.analytic.SunCND
 
 @RunWith(classOf[JUnitRunner])
 class CumulativeNormalDistributionSuite extends FunSuite {
@@ -224,6 +216,56 @@ class CumulativeNormalDistributionSuite extends FunSuite {
     }
 
   }
+
+  test("performance") {
+    val low = -37 // -12.0
+    val high = 8.0 // 5.0
+    val maxIter = 10000
+    for (k<- 0 until 10) {
+
+      var start = System.nanoTime()
+      var sum = 0.0
+      for (i <- 0 until maxIter) {
+        val x = low + (high - low) * i / (maxIter - 1)
+         sum += CodyCND.value(x)
+      }
+      var elapsed = System.nanoTime()-start
+      println("Cody  "+elapsed*1e-9+" "+sum)
+      start = System.nanoTime()
+      sum = 0.0
+      for (i <- 0 until maxIter) {
+        val x = low + (high - low) * i / (maxIter - 1)
+        sum += CodyInlinedCND.value(x)
+      }
+      elapsed = System.nanoTime()-start
+      println("CodyI "+elapsed*1e-9+" "+sum)
+      start = System.nanoTime()
+      sum = 0.0
+      for (i <- 0 until maxIter) {
+        val x = low + (high - low) * i / (maxIter - 1)
+        sum += SchonfelderCND.value(x)
+      }
+      elapsed = System.nanoTime()-start
+      println("Schon "+elapsed*1e-9+" "+sum)
+      start = System.nanoTime()
+      sum = 0.0
+      for (i <- 0 until maxIter) {
+        val x = low + (high - low) * i / (maxIter - 1)
+        sum += OouraCND.value(x)
+      }
+      elapsed = System.nanoTime()-start
+      println("Ooura "+elapsed*1e-9+" "+sum)
+      start = System.nanoTime()
+      sum = 0.0
+      for (i <- 0 until maxIter) {
+        val x = low + (high - low) * i / (maxIter - 1)
+        sum += JohnsonCND.value(x)
+      }
+      elapsed = System.nanoTime()-start
+      println("Johns "+elapsed*1e-9+" "+sum)
+
+    }
+  }
   test("absolute-middle-precision") {
     val low = -37 // -12.0
     val high = 8.0 // 5.0
@@ -237,10 +279,12 @@ class CumulativeNormalDistributionSuite extends FunSuite {
       val cndSchon = SchonfelderCND.value(x)
       val cndHill = HillAS66CND.value(x)
       val cndOo = OouraCND.value(x)
+      val cndJ = JohnsonCND.value(x)
       assert(math.abs(cndCody - cndHart) < accuracy, "cody vs hart " + cndCody + " " + cndHart + " at " + x)
       assert(math.abs(cndSchon - cndHart) < accuracy, "Schonfelder vs hart " + cndSchon + " " + cndHart + " at " + x)
       assert(math.abs(cndHill - cndHart) < 1e-11, "Hill vs hart " + cndHill + " " + cndHart + " at " + x)
-      assert(math.abs(cndOo - cndHart) < 1e-11, "Ooura vs hart" + cndOo + " " + cndHart + " at" + x)
+      assert(math.abs(cndOo - cndHart) < accuracy, "Ooura vs hart" + cndOo + " " + cndHart + " at" + x)
+      assert(math.abs(cndJ - cndHart) < accuracy, "Johnson vs hart " + cndJ + " " + cndHart + " at " + x)
     }
   }
 
@@ -251,7 +295,7 @@ class CumulativeNormalDistributionSuite extends FunSuite {
     val accuracy = 1e-15
     val eps = 1e-6
 //    println("x\tApproximation\tValue\tRelativeError\tDiff")
-println("x\tCody\tHart\tHartQL\tSchon\tHill\tOoura")
+println("x\tCody\tHart\tHartQL\tSchon\tHill\tOoura\tJohnson")
     
         for (i <- 0 until maxIter) {
           val x = low + (high - low) * i / (maxIter - 1)
@@ -262,6 +306,7 @@ println("x\tCody\tHart\tHartQL\tSchon\tHill\tOoura")
     val cndSchon = SchonfelderCND.value(x)
     val cndHill = HillAS66CND.value(x)
     val cndOo = OouraCND.value(x)
+    val cndJ = JohnsonCND.value(x)
     val cndCodyOpp = 1.0 - CodyCND.value(-x)
     val cndHartOpp = 1.0 - HartCND.value(-x)
     val cndSchonOpp = 1.0 - SchonfelderCND.value(-x)
@@ -276,7 +321,7 @@ println("x\tCody\tHart\tHartQL\tSchon\tHill\tOoura")
     val dHartOpp = HartCND.value(-x) - HartCND.value(-y)
     val dSchonOpp = SchonfelderCND.value(-x) - SchonfelderCND.value(-y)
     val dHillOpp = HillAS66CND.value(-x) - HillAS66CND.value(-y)
-    println(x + "\t"+cndCody+"\t"+cndHart+"\t"+cndHartQL+"\t"+cndSchon+"\t"+cndHill+"\t"+cndOo)
+    println(x + "\t"+cndCody+"\t"+cndHart+"\t"+cndHartQL+"\t"+cndSchon+"\t"+cndHill+"\t"+cndOo+"\t"+cndJ)
     
     //    println(x + "\tCody\t" + cndCody + "\t" + 0.0 + "\t" + dCody)
 //    println(x + "\tHart\t" + cndHart + "\t" + math.abs((cndCody - cndHart) / cndCody) + "\t" + dHart)
@@ -300,25 +345,56 @@ println("x\tCody\tHart\tHartQL\tSchon\tHill\tOoura")
     val high = 8.0 // 5.0
     val maxIter = (37+8)*4+1//100
     val accuracy = 1e-15
-//    println("x\tApproximation\tValue\tRelativeError\tDiff")
-println("x\tCody\tHart\tHartQL\tSchon\tHill\tOoura")
-    
+    println("x\tMethod\tValue")
+
         for (i <- 0 until maxIter) {
           val x = low + (high - low) * i / (maxIter - 1)
 //    val x = -16.6
     val cndCody = CodyCND.value(x)
+          println(x + "\tCody\t"+cndCody)
     val cndHart = HartCND.value(x)
+          println(x + "\tHart\t"+cndHart)
     val cndHartQL = HartCND.improve(x, cndHart)
+          println(x + "\tHartQL\t"+cndHartQL)
     val cndSchon = SchonfelderCND.value(x)
+          println(x + "\tSchonfelder\t"+cndSchon)
     val cndHill = HillAS66CND.value(x)
+          println(x + "\tHill\t"+cndHill)
     val cndOo = OouraCND.value(x)
-    val cndCodyOpp = 1.0 - CodyCND.value(-x)
-    val cndHartOpp = 1.0 - HartCND.value(-x)
-    val cndSchonOpp = 1.0 - SchonfelderCND.value(-x)
-    val cndHillOpp = 1.0 - HillAS66CND.value(-x)
-    println(x + "\t"+cndCody+"\t"+cndHart+"\t"+cndHartQL+"\t"+cndSchon+"\t"+cndHill+"\t"+cndOo)
-    
+          println(x + "\tOoura\t"+cndOo)
+    val cndJ = JohnsonCND.value(x)
+          println(x + "\tJohnson\t"+cndJ)
+
         }
+        }
+
+     test("relative-high-precision-exact-200") {
+       val low = -37 // -12.0
+       val high = 8.0 // 5.0
+       val maxIter = 200//100
+       val accuracy = 1e-15
+       println("x\tMethod\tValue")
+
+       for (i <- 0 until maxIter) {
+         val x = low + (high - low) * i / (maxIter - 1)
+         //    val x = -16.6
+//         val cndCody = CodyCND.value(x)
+//         println(x + "\tCody\t"+cndCody)
+//         val cndHart = HartCND.value(x)
+//         println(x + "\tHart\t"+cndHart)
+//         val cndHartQL = HartCND.improve(x, cndHart)
+//         println(x + "\tHartQL\t"+cndHartQL)
+//         val cndSchon = SchonfelderCND.value(x)
+//         println(x + "\tSchonfelder\t"+cndSchon)
+//         val cndHill = HillAS66CND.value(x)
+//         println(x + "\tHill\t"+cndHill)
+//         val cndOo = OouraCND.value(x)
+//         println(x + "\tOoura\t"+cndOo)
+         val cndJ = JohnsonCND.value(x)
+         println(x + "\tJohnson\t"+cndJ)
+
+
+       }
   }
 
       test("relative-high-precision-rand") {
