@@ -10,7 +10,7 @@ class HaganLMG2SABRDensitySolver(spec: SABRModelSpec, forward: Double, T: Double
   override def solve() {
     tri1 = new TridiagonalMatrix(size) //Full
     //    val tri1Half = new TridiagonalMatrix(size) //Half
-//    M0 = Array.ofDim[Double](size)
+    //    M0 = Array.ofDim[Double](size)
     M1 = Array.ofDim[Double](size)
     buildMcache(dt / 2, 0, M1)
     Q0_ = computeQ()
@@ -29,7 +29,7 @@ class HaganLMG2SABRDensitySolver(spec: SABRModelSpec, forward: Double, T: Double
       //        tIndex += 1
       //      }
       t -= dt / 2
-//      System.arraycopy(M0, 0, M1, 0, size)
+      //      System.arraycopy(M0, 0, M1, 0, size)
       advance(dt / 2, M1)
       computeSystem(tri1, dt / 2)
       Q0_(0) = 0
@@ -72,7 +72,7 @@ class HaganLMG2SABRDensitySolver(spec: SABRModelSpec, forward: Double, T: Double
       //        i-=1
       //      }
       //      println("t="+t+" LMG2 Q="+sum)
-//      M0 = M1
+      //      M0 = M1
       val Qtmp = Q0_
       Q0_ = Q1
       Q1 = Qtmp

@@ -1,7 +1,6 @@
 package test.quantscale.analytic
 
 import org.junit.runner.RunWith
-import org.scalatest.FunSuite
 import quantscale.analytic.BachelierVanillaEuropean
 import quantscale.analytic.BlackScholesVanillaEuropean
 import quantscale.analytic.SABRModelSpec
@@ -14,12 +13,13 @@ import quantscale.math.CubicSpline
 import quantscale.vol.Li2011SORBlackVolatilitySolver
 import quantscale.vol.Li2011SORDRBlackVolatilitySolver
 import quantscale.vol.Li2011SORTSBlackVolatilitySolver
-import org.scalatest.junit.JUnitRunner
+import org.scalatest.junit.{JUnitSuite, JUnitRunner}
 import quantscale.fdm.Epsilon
+import org.junit.Test
 
 @RunWith(classOf[JUnitRunner])
-class SABRSuite extends FunSuite {
-  test("put-call-parity") {
+class SABRSuite extends JUnitSuite {
+  @Test def testPutCallParity() {
     val alpha = 0.35;
     val nu = 1.0;
     val beta = 0.25;
@@ -58,7 +58,7 @@ class SABRSuite extends FunSuite {
       // println(f"$name & $h%2.12f & $Qforward%2.12f & $QL%2.12f & $QR%2.12f\\\\")
     }
   }
-  test("li-sordr-iv") {
+  @Test def testLiSorDRIV {
     val forward = 100.0
     val strikes = Array(0.2 * forward, 0.5 * forward, 0.9 * forward, 1.0 * forward, 1.1 * forward, 1.5 * forward)
     val sigma = 0.4
@@ -74,7 +74,7 @@ class SABRSuite extends FunSuite {
     }
   }
 
-  test("li-sorts-iv") {
+  @Test def testLiSORTSIV() {
     val forward = 100.0
     val strikes = Array(0.2 * forward, 0.5 * forward, 0.9 * forward, 1.0 * forward, 1.1 * forward, 1.5 * forward)
     val sigma = 0.4
@@ -89,7 +89,8 @@ class SABRSuite extends FunSuite {
       assert(math.abs(vol - sigma) < 1e-4)
     }
   }
-  test("li-sor-iv") {
+
+  @Test def testLiSORIV() {
     val forward = 1.0
     val strikes = Array(0.5, 0.9, 1.0, 1.1, 1.5)
     val sigma = 0.4
@@ -105,7 +106,7 @@ class SABRSuite extends FunSuite {
     }
   }
 
-  test("li-hagan") {
+  @Test def testLiHagan() {
     val alpha = 0.0758194;
     val nu = 0.1;
     val beta = 0.5;
@@ -126,7 +127,7 @@ class SABRSuite extends FunSuite {
     assert(math.abs(solvedVol - blackVol) < 1e-4)
   }
 
-  test("hagan") {
+  @Test def testHagan() {
     val alpha = 0.0758194;
     val nu = 0.1;
     val beta = 0.5;
@@ -140,7 +141,7 @@ class SABRSuite extends FunSuite {
     assert(math.abs(0.6444840588326359 - blackVol) < 1e-15)
   }
 
-  test("hagan-fd-price") {
+  @Test def testHaganFDPrice() {
     val alpha = 0.0758194;
     val nu = 0.1;
     val beta = 0.5;
@@ -158,7 +159,7 @@ class SABRSuite extends FunSuite {
     println(pdePrice)
   }
 
-  test("hagan-benhamou") {
+  @Test def testHaganBenhamou() {
     val alpha = 0.0758194;
     val nu = 0.1;
     val beta = 0.5;
@@ -181,7 +182,7 @@ class SABRSuite extends FunSuite {
 
   }
 
-  test("hagan-normal") {
+  @Test def testHaganNormal() {
     val alpha = 0.0758194;
     val nu = 0.1;
     val beta = 0.5;
@@ -204,7 +205,7 @@ class SABRSuite extends FunSuite {
 
   }
 
-  test("andreasenhuge") {
+  @Test def testAndreasenHuge() {
     val alpha = 0.0758194;
     val nu = 0.1;
     val beta = 0.5;
@@ -220,7 +221,7 @@ class SABRSuite extends FunSuite {
     assert(math.abs(haganVol - ahVol) < 3e-4)
   }
 
-  test("andreasenhuge-price") {
+  @Test def  testAndreasenHugePrice() {
     val alpha = 0.0758194;
     val nu = 0.1;
     val beta = 0.5;
@@ -251,7 +252,7 @@ class SABRSuite extends FunSuite {
     }
   }
 
-  test("andreasenhuge-density") {
+  @Test def testAndreasenHugeDensity() {
     val alpha = 0.0873;
     val nu = 0.47;
     val beta = 0.7;
@@ -370,7 +371,7 @@ class SABRSuite extends FunSuite {
     }
   }
 
-  test("hagan-density") {
+  @Test def testHaganDensity() {
     val alpha = 0.35;
     val nu = 1.0;
     val beta = 0.25;
@@ -518,7 +519,7 @@ class SABRSuite extends FunSuite {
     }
   }
 
-  test("alan") {
+  @Test def testAlan() {
     val forward = 1.0
     val K = 0.8
     val tte = 10.0
@@ -595,7 +596,7 @@ class SABRSuite extends FunSuite {
     return (maxError, Fmax)
   }
 
-  test("pde-density-accuracy-ah") {
+  @Test def  testPDEDensityAccuracyAH() {
     val alpha = 0.0873;
     val nu = 0.47;
     val beta = 0.7;
@@ -696,7 +697,7 @@ class SABRSuite extends FunSuite {
     }
   }
 
-  test("pde-vol-accuracy-ah") {
+  @Test def testPDEVolAccuracyAH() {
     val alpha = 0.0873;
     val nu = 0.47;
     val beta = 0.7;
@@ -744,7 +745,7 @@ class SABRSuite extends FunSuite {
     else f"$spaceStep $timeStep $scheme $error%2.1e $errorLocation%2.4f $elapsed%2.1e\n"
   }
 
-  test("pde-density-accuracy-hagan") {
+  @Test def testPDEDensityAccuracyHagan() {
     val isLatex = false
     val alpha = 0.35;
     val nu = 1.0;
@@ -790,7 +791,7 @@ class SABRSuite extends FunSuite {
     }
   }
 
-  test("pde-vol-accuracy-hagan") {
+  @Test def testPDEVolAccuracyHagan() {
     val alpha = 0.35;
     val nu = 1.0;
     val beta = 0.25;
@@ -831,7 +832,7 @@ class SABRSuite extends FunSuite {
     }
   }
 
-  test("pde-vs-formula-performance-hagan") {
+  @Test def testPDEvsFormulaPerformanceHagan() {
     val alpha = 0.35;
     val nu = 1.0;
     val beta = 0.25;
@@ -883,7 +884,7 @@ class SABRSuite extends FunSuite {
     println(f"$pdeElapsed%2.4f $formulaElapsed%2.4f $ratio%2.1f")
   }
 
-  test("pde-vs-formula-performance-ah") {
+  @Test def testPDEvsFormulaPerformanceAH() {
     val alpha = 0.0873;
     val nu = 0.47;
     val beta = 0.7;
@@ -935,7 +936,7 @@ class SABRSuite extends FunSuite {
     println(f"$pdeElapsed%2.4f $formulaElapsed%2.4f $ratio%2.1f")
   }
 
-  test("pde-performance-hagan") {
+  @Test def testPDEPerformanceHagan() {
     val alpha = 0.35;
     val nu = 1.0;
     val beta = 0.25;
@@ -1062,7 +1063,7 @@ class SABRSuite extends FunSuite {
     }
   }
 
-  test("hagan-vol-simple") {
+  @Test def testHaganVolSimple() {
     val alpha = 0.35;
     val nu = 1.0;
     val beta = 0.25;
@@ -1125,7 +1126,7 @@ class SABRSuite extends FunSuite {
 
   }
 
-  test("hagan-key-numbers") {
+  @Test def testHaganKeyNumbers() {
     val alpha = 0.35;
     val nu = 1.0;
     val beta = 0.25;
@@ -1179,7 +1180,8 @@ class SABRSuite extends FunSuite {
     }
 
   }
-  test("hagan-density-simple") {
+
+  @Test def testHaganDensitySimple() {
     val alpha = 0.35;
     val nu = 1.0;
     val beta = 0.25;
@@ -1248,7 +1250,7 @@ class SABRSuite extends FunSuite {
     }
   }
 
-  test("pde-performance-andreasen") {
+  @Test def testPDEPerfomanceAndreason() {
     val alpha = 0.0873;
     val nu = 0.47;
     val beta = 0.7;
@@ -1411,7 +1413,7 @@ class SABRSuite extends FunSuite {
     return (value, maxError, Fmax)
   }
 
-  test("pde-density-convergence-hagan") {
+  @Test def testPDEDensityConvergenceHagan() {
     val isLatex = false
     val alpha = 0.35;
     val nu = 1.0;
@@ -1460,7 +1462,7 @@ class SABRSuite extends FunSuite {
     }
   }
 
-  test("pde-vol-convergence-hagan") {
+  @Test def testPDEVolConvergenceHagan() {
     val isLatex = false
     val alpha = 0.35;
     val nu = 1.0;

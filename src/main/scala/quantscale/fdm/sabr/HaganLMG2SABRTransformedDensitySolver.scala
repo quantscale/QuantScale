@@ -24,13 +24,13 @@ class HaganLMG2SABRTransformedDensitySolver(spec: SABRModelSpec, forward: Double
       //        tIndex += 1
       //      }
       t -= dt / 2
-//      System.arraycopy(M0, 0, M1, 0, size)
+      //      System.arraycopy(M0, 0, M1, 0, size)
       advanceEm(dt / 2, Em_)
       computeSystem(dt / 2, Em_, tri1)
       Q0_(0) = 0
       Q0_(size - 1) = 0
       solver.solve(tri1, Q0_, Q1Half)
-      var QL_Part = dt / 2  * computedQLdt(Em_, Q1Half)
+      var QL_Part = dt / 2 * computedQLdt(Em_, Q1Half)
       var QR_Part = dt / 2 * computedQRdt(Em_, Q1Half)
       val Q0_Init = Q0_
       Q0_ = Q1Half
@@ -67,7 +67,7 @@ class HaganLMG2SABRTransformedDensitySolver(spec: SABRModelSpec, forward: Double
       //        i-=1
       //      }
       //      println("t="+t+" LMG2 Q="+sum)
-//      M0 = M1
+      //      M0 = M1
       val Qtmp = Q0_
       Q0_ = Q1
       Q1 = Qtmp

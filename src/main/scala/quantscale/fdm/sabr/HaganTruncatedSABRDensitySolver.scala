@@ -45,8 +45,8 @@ class HaganTruncatedSABRDensitySolver(spec: SABRModelSpec, forward: Double, T: D
         //          QL+=dt/(4*h)*(-3*M1(0)*Q1(0)+4*M1(1)*Q1(1)-M1(2)*Q1(2))
         //        QR -= dt / (4 * h) * (3*M1(size - 1) * Q1(size - 1) -4* M1(size - 2) * Q1(size - 2)+M1(size - 3) * Q1(size - 3))
 
-                QL += dt / (2*h) * (M1(1) * Q1(1) - M1(0) * Q1(0))
-                QR -= dt / (2*h) * (M1(size - 1) * Q1(size - 1) - M1(size - 2) * Q1(size - 2))
+        QL += dt / (2 * h) * (M1(1) * Q1(1) - M1(0) * Q1(0))
+        QR -= dt / (2 * h) * (M1(size - 1) * Q1(size - 1) - M1(size - 2) * Q1(size - 2))
 
         val Qtmp = Q0
         Q0 = Q1
@@ -78,11 +78,11 @@ class HaganTruncatedSABRDensitySolver(spec: SABRModelSpec, forward: Double, T: D
         //        QR -= dt / (4 * h) * (3*M1(size - 1) * Q1(size - 1) -4* M1(size - 2) * Q1(size - 2)+M1(size - 3) * Q1(size - 3) +
         //            3*M0(size - 1) * Q0(size - 1) - 4*M0(size - 2) * Q0(size - 2)+M0(size - 3) * Q0(size - 3))
 
-                QL += dt / (2 * h) * (M1(1) * Q1(1) - M1(0) * Q1(0) + M0(1) * Q0(1) - M0(0) * Q0(0))
-                QR -= dt / (2 * h) * (M1(size - 1) * Q1(size - 1) - M1(size - 2) * Q1(size - 2) + M0(size - 1) * Q0(size - 1) - M0(size - 2) * Q0(size - 2))
+        QL += dt / (2 * h) * (M1(1) * Q1(1) - M1(0) * Q1(0) + M0(1) * Q0(1) - M0(0) * Q0(0))
+        QR -= dt / (2 * h) * (M1(size - 1) * Q1(size - 1) - M1(size - 2) * Q1(size - 2) + M0(size - 1) * Q0(size - 1) - M0(size - 2) * Q0(size - 2))
 
-//        QL += dt / (2 * h) * (2 * M1(1) * Q1(1) + 2 * M0(1) * Q0(1))
-//        QR -= dt / (2 * h) * (2 * M1(size - 1) * Q1(size - 1) + 2 * M0(size - 1) * Q0(size - 1))
+        //        QL += dt / (2 * h) * (2 * M1(1) * Q1(1) + 2 * M0(1) * Q0(1))
+        //        QR -= dt / (2 * h) * (2 * M1(size - 1) * Q1(size - 1) + 2 * M0(size - 1) * Q0(size - 1))
 
       }
 
@@ -207,6 +207,7 @@ class HaganTruncatedSABRDensitySolver(spec: SABRModelSpec, forward: Double, T: D
     }
     return M
   }
+
   private[sabr] def computeFAndh(): Array[Double] = {
     var j = 0
     var F = Array.ofDim[Double](size)

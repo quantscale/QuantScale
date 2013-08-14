@@ -5,7 +5,7 @@ import quantscale.fdm.TridiagonalMatrix
 
 /* Date: 8/12/13
  */
-class HaganLawsonSwayneSABRTransformedDensitySolver (spec: SABRModelSpec, forward: Double, T: Double, size: Int = 100, timeSteps: Int = 10, nDeviations: Double = 3.0)
+class HaganLawsonSwayneSABRTransformedDensitySolver(spec: SABRModelSpec, forward: Double, T: Double, size: Int = 100, timeSteps: Int = 10, nDeviations: Double = 3.0)
   extends HaganSABRTransformedDensitySolver(spec, forward, T, size, timeSteps, nDeviations) {
 
   private val b = 1 - math.sqrt(2) / 2
@@ -13,7 +13,7 @@ class HaganLawsonSwayneSABRTransformedDensitySolver (spec: SABRModelSpec, forwar
 
   override def solve() {
     tri1 = new TridiagonalMatrix(size) //Full
-    buildEmCache(dt *b, dt*(1-2*b))
+    buildEmCache(dt * b, dt * (1 - 2 * b))
     Q0_ = computeQ()
     Q1 = Array.ofDim(size)
     val Q1Half = Array.ofDim[Double](size)
@@ -31,7 +31,7 @@ class HaganLawsonSwayneSABRTransformedDensitySolver (spec: SABRModelSpec, forwar
       //              tIndex += 1
       //            }
       t -= dt
-      advanceEm(dt*b, Em_)
+      advanceEm(dt * b, Em_)
       computeSystem(dt * b, Em_, tri1)
       Q0_(0) = 0
       Q0_(size - 1) = 0
@@ -41,16 +41,16 @@ class HaganLawsonSwayneSABRTransformedDensitySolver (spec: SABRModelSpec, forwar
       QL_Half = QL_Full
       QR_Half = QR_Full
       // //check sum
-//                        var sum = QR_Half + QL_Half
-//                  var i = size - 2
-//                  while (i > 0) {
-//                    sum += h * Q1Half(i)
-//                    i -= 1
-//                  }
-//                  println("t=" + t + " LawsonSwayne-1 Q=" + sum+ "Q(f)="+Q1Half(j0)+" QL="+QL_Half+" QR="+QR_Half)
+      //                        var sum = QR_Half + QL_Half
+      //                  var i = size - 2
+      //                  while (i > 0) {
+      //                    sum += h * Q1Half(i)
+      //                    i -= 1
+      //                  }
+      //                  println("t=" + t + " LawsonSwayne-1 Q=" + sum+ "Q(f)="+Q1Half(j0)+" QL="+QL_Half+" QR="+QR_Half)
 
       //      t -= dt *b
-      advanceEm(dt*b, Em_)
+      advanceEm(dt * b, Em_)
       computeSystem(dt * b, Em_, tri1)
       Q1Half(0) = 0
       Q1Half(size - 1) = 0
@@ -73,7 +73,7 @@ class HaganLawsonSwayneSABRTransformedDensitySolver (spec: SABRModelSpec, forwar
       }
       QL_ = (sqrt2 + 1) * QL_Full - sqrt2 * QL_Half
       QR_ = (sqrt2 + 1) * QR_Full - sqrt2 * QR_Half
-      advanceEm(dt*(1-2*b),Em_)
+      advanceEm(dt * (1 - 2 * b), Em_)
       //printSumQF(t)
       Qtmp = Q0_
       Q0_ = Q1

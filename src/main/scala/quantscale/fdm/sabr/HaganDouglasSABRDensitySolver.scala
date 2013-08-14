@@ -24,8 +24,8 @@ class HaganDouglasSABRDensitySolver(spec: SABRModelSpec, forward: Double, T: Dou
     } else {
       buildMcache(dt, 0, M0)
     }
-    theta = math.max(0,0.5 - h*h/(12*M0(j0)*dt))
-    println("theta=" + theta + " " + computeCourantNumber + " " + (dt * M0(size-1) / (h * h)))
+    theta = math.max(0, 0.5 - h * h / (12 * M0(j0) * dt))
+    println("theta=" + theta + " " + computeCourantNumber + " " + (dt * M0(size - 1) / (h * h)))
     Q0_ = computeQ()
     Q1 = Array.ofDim(size)
     QL_ = 0.0
@@ -110,15 +110,15 @@ class HaganDouglasSABRDensitySolver(spec: SABRModelSpec, forward: Double, T: Dou
       tri0.upper(j) = frac * (1 - theta) * M0(j + 1)
       j += 1
     }
-//    tri1.upper(0) = 0
-//    tri1.middle(0) = 1
-//      tri1.lower(size - 1) = 0
-//      tri1.middle(size - 1) = 1
-//        tri0.upper(0) = 0
-//    tri0.middle(0) = 1
-//      tri0.lower(size - 1) = 0
-//      tri0.middle(size - 1) = 1
-    
+    //    tri1.upper(0) = 0
+    //    tri1.middle(0) = 1
+    //      tri1.lower(size - 1) = 0
+    //      tri1.middle(size - 1) = 1
+    //        tri0.upper(0) = 0
+    //    tri0.middle(0) = 1
+    //      tri0.lower(size - 1) = 0
+    //      tri0.middle(size - 1) = 1
+
     tri1.upper(0) = M1(1)
     tri1.middle(0) = M1(0)
     if (useApproxBoundary) {

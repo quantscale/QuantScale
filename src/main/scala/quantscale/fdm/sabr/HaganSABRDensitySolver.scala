@@ -30,7 +30,9 @@ class HaganSABRDensitySolver(spec: SABRModelSpec, forward: Double, T: Double, si
   def h: Double = h_
 
   def Q0: Array[Double] = Q0_
+
   def QL = QL_
+
   def QR = QR_
 
   def dt = dt_
@@ -82,10 +84,10 @@ class HaganSABRDensitySolver(spec: SABRModelSpec, forward: Double, T: Double, si
     var tIndex = 0
 
     while (t > Epsilon.MACHINE_EPSILON_SQRT) {
-//                        if (tIndex < 4) {
-//                          printTimeStep(t)
-//                          tIndex += 1
-//                        }
+      //                        if (tIndex < 4) {
+      //                          printTimeStep(t)
+      //                          tIndex += 1
+      //                        }
       if (useSmoothing && indexRannacher < 1) {
         val dtSmooth = dt / 2
         t -= dtSmooth
@@ -326,7 +328,7 @@ class HaganSABRDensitySolver(spec: SABRModelSpec, forward: Double, T: Double, si
   def computeCourantNumber(): Double = {
     var cfl = spec.alpha * math.pow(forward, spec.beta)
     cfl = cfl * cfl //* math.exp(spec.rho * spec.nu * spec.alpha * T * spec.beta * math.pow(forward, spec.beta - 1))
-    cfl *= 0.5*dt / (h * h)
+    cfl *= 0.5 * dt / (h * h)
     return cfl
   }
 

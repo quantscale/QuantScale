@@ -35,8 +35,8 @@ class HaganLMG3SABRTransformedDensitySolver(spec: SABRModelSpec, forward: Double
       Q0_(0) = 0
       Q0_(size - 1) = 0
       solver.solve(tri1, Q0_, Q1ThirdTmp)
-      var QL_ThirdPart =  QL_ + dt/3 *  computedQLdt(Em_, Q1ThirdTmp)
-      var QR_ThirdPart = QR_ + dt/3  * computedQRdt(Em_,Q1ThirdTmp)
+      var QL_ThirdPart = QL_ + dt / 3 * computedQLdt(Em_, Q1ThirdTmp)
+      var QR_ThirdPart = QR_ + dt / 3 * computedQRdt(Em_, Q1ThirdTmp)
       var QL_HalfPart = QL_ThirdPart
       var QR_HalfPart = QR_ThirdPart
       val Q0_Init = Q0_
@@ -44,12 +44,12 @@ class HaganLMG3SABRTransformedDensitySolver(spec: SABRModelSpec, forward: Double
 
       t -= dt / 3
       advanceEm(dt / 3, Em_)
-      computeSystem(dt/3, Em_, tri1)
+      computeSystem(dt / 3, Em_, tri1)
       Q0_(0) = 0
       Q0_(size - 1) = 0
       solver.solve(tri1, Q0_, Q1Third)
-      QL_ThirdPart += dt/3  * computedQLdt(Em_, Q1Third)
-      QR_ThirdPart += dt/3  * computedQRdt(Em_, Q1Third)
+      QL_ThirdPart += dt / 3 * computedQLdt(Em_, Q1Third)
+      QR_ThirdPart += dt / 3 * computedQRdt(Em_, Q1Third)
       Q0_ = Q1Third
 
       t -= dt / 3
@@ -58,16 +58,16 @@ class HaganLMG3SABRTransformedDensitySolver(spec: SABRModelSpec, forward: Double
       Q0_(0) = 0
       Q0_(size - 1) = 0
       solver.solve(tri1, Q0_, Q1Third)
-      QL_ThirdPart += dt/3 * computedQLdt(Em_, Q1Third)
-      QR_ThirdPart += dt/3 * computedQRdt(Em_, Q1Third)
+      QL_ThirdPart += dt / 3 * computedQLdt(Em_, Q1Third)
+      QR_ThirdPart += dt / 3 * computedQRdt(Em_, Q1Third)
 
       Q0_ = Q1ThirdTmp
       computeSystem(2 * dt / 3, Em_, tri1)
       Q0_(0) = 0
       Q0_(size - 1) = 0
       solver.solve(tri1, Q0_, Q1Half)
-      QL_HalfPart += 2*dt/3 * computedQLdt(Em_, Q1Half)
-      QR_HalfPart += 2*dt/3 * computedQRdt(Em_, Q1Half)
+      QL_HalfPart += 2 * dt / 3 * computedQLdt(Em_, Q1Half)
+      QR_HalfPart += 2 * dt / 3 * computedQRdt(Em_, Q1Half)
 
       Q0_ = Q0_Init
       computeSystem(dt, Em_, tri1)
@@ -107,7 +107,7 @@ class HaganLMG3SABRTransformedDensitySolver(spec: SABRModelSpec, forward: Double
       Qtmp = Q0_
       Q0_ = Q1
       Q1 = Qtmp
-      tIndex +=1
+      tIndex += 1
     }
   }
 

@@ -48,7 +48,7 @@ class HaganRichardsonEulerSABRDensitySolver(spec: SABRModelSpec, forward: Double
       solver.solve(tri1, Q0_, Q1)
       QL_ += dt / (h) * (M1(1) * Q1(1) - M1(0) * Q1(0))
       QR_ -= dt / (h) * (M1(size - 1) * Q1(size - 1) - M1(size - 2) * Q1(size - 2))
-//      M0 = M1
+      //      M0 = M1
       val Qtmp = Q0_
       Q0_ = Q1
       Q1 = Qtmp

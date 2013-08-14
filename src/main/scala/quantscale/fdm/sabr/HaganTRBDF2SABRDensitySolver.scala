@@ -17,7 +17,7 @@ class HaganTRBDF2SABRDensitySolver(spec: SABRModelSpec, forward: Double, T: Doub
     M0 = Array.ofDim[Double](size)
     M1 = Array.ofDim[Double](size)
     val bdt = dt * backcoeff
-    buildMcache(2*bdt, dt - 2* bdt, M0)
+    buildMcache(2 * bdt, dt - 2 * bdt, M0)
     Q0_ = computeQ()
     Q1 = Array.ofDim(size)
     QL_ = 0.0
@@ -28,18 +28,18 @@ class HaganTRBDF2SABRDensitySolver(spec: SABRModelSpec, forward: Double, T: Doub
     var tIndex = 0
 
     while (t > Epsilon.MACHINE_EPSILON_SQRT) {
-//                  if (tIndex < 4) {
-//              printTimeStep(t)
-//              tIndex += 1
-//            }
+      //                  if (tIndex < 4) {
+      //              printTimeStep(t)
+      //              tIndex += 1
+      //            }
 
       t -= dt
       Array.copy(M0, 0, M1, 0, size)
-      advance(2*bdt, M1)
+      advance(2 * bdt, M1)
       computeSystem(tri1, bdt)
       tri0.multiply(Q0_, rhs)
-//      rhs(0) = 0
-//      rhs(size - 1) = 0
+      //      rhs(0) = 0
+      //      rhs(size - 1) = 0
       solver.solve(tri1, rhs, Q1)
       val QL_init = QL_
       val QR_init = QR_
@@ -61,7 +61,7 @@ class HaganTRBDF2SABRDensitySolver(spec: SABRModelSpec, forward: Double, T: Doub
         rhs(j) = frac * (Q1(j) - (1 - alpha) * (1 - alpha) * Q0_(j))
         j -= 1
       }
-      advance(dt - 2*bdt, M1)
+      advance(dt - 2 * bdt, M1)
       computeSystem(tri1, bdt)
       solver.solve(tri1, rhs, Q1)
       //      QL_Part += dt / (2*h) * (M1(1) * Q1(1) - M1(0) * Q1(0))

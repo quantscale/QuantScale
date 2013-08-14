@@ -25,7 +25,7 @@ class HaganRichardsonEulerSABRTransformedDensitySolver(spec: SABRModelSpec, forw
     QR_ = 2 * QR_ - QR_full
   }
 
-  def solve(divisor : Int) {
+  def solve(divisor: Int) {
     tri1 = new TridiagonalMatrix(size)
     buildEmCache(dt_, 0)
 
@@ -35,7 +35,7 @@ class HaganRichardsonEulerSABRTransformedDensitySolver(spec: SABRModelSpec, forw
     QR_ = 0.0
     var t = T
     var tIndex = 0
-    while (tIndex < timeSteps*divisor) {
+    while (tIndex < timeSteps * divisor) {
       t -= dt
       advanceEm(dt_, Em_)
       computeSystem(dt_, Em_, tri1)
@@ -44,7 +44,7 @@ class HaganRichardsonEulerSABRTransformedDensitySolver(spec: SABRModelSpec, forw
       solver.solve(tri1, Q0_, Q1)
       QL_ += dt_ * computedQLdt(Em_, Q1)
       QR_ += dt_ * computedQRdt(Em_, Q1)
-   //   printSumQF("RE",t,Q1, QL_, QR_)
+      //   printSumQF("RE",t,Q1, QL_, QR_)
       val Qtmp = Q0_
       Q0_ = Q1
       Q1 = Qtmp
