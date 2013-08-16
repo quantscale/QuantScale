@@ -14,30 +14,29 @@ class HaganLawsonSwayneSABRTransformedDensitySolver(spec: SABRModelSpec, forward
   override def solve() {
     tri1 = new TridiagonalMatrix(size) //Full
     buildEmCache(dt * b, dt * (1 - 2 * b))
-    Q0_ = computeQ()
-    Q1 = Array.ofDim(size)
+    P0_ = computeP()
+    P1_ = Array.ofDim(size)
     val Q1Half = Array.ofDim[Double](size)
-    QL_ = 0.0
+    PL_ = 0.0
     var QL_Full, QL_Half, Q1HalfStart, Q1HalfEnd = 0.0
     var QR_Full, QR_Half = 0.0
-    QR_ = 0.0
+    PR_ = 0.0
     var t = T
     var tIndex = 0
-    var Qtmp = Q0_
+    var Qtmp = P0_
 
     while (tIndex < timeSteps) {
-      //             if (tIndex < 4) {
-      //              printTimeStep(t)
-      //              tIndex += 1
-      //            }
+//                   if (tIndex < 4) {
+//                    printTimeStep(t)
+//                  }
       t -= dt
       advanceEm(dt * b, Em_)
       computeSystem(dt * b, Em_, tri1)
-      Q0_(0) = 0
-      Q0_(size - 1) = 0
-      solver.solve(tri1, Q0_, Q1Half)
-      QL_Full = QL_ + dt * b * computedQLdt(Em_, Q1Half)
-      QR_Full = QR_ + dt * b * computedQRdt(Em_, Q1Half)
+      P0_(0) = 0
+      P0_(size - 1) = 0
+      solver.solve(tri1, P0_, Q1Half)
+      QL_Full = PL_ + dt * b * computedPLdt(Em_, Q1Half)
+      QR_Full = PR_ + dt * b * computedPRdt(Em_, Q1Half)
       QL_Half = QL_Full
       QR_Half = QR_Full
       // //check sum
@@ -54,9 +53,9 @@ class HaganLawsonSwayneSABRTransformedDensitySolver(spec: SABRModelSpec, forward
       computeSystem(dt * b, Em_, tri1)
       Q1Half(0) = 0
       Q1Half(size - 1) = 0
-      solver.solve(tri1, Q1Half, Q1)
-      QL_Full += dt * b * computedQLdt(Em_, Q1)
-      QR_Full += dt * b * computedQRdt(Em_, Q1)
+      solver.solve(tri1, Q1Half, P1_)
+      QL_Full += dt * b * computedPLdt(Em_, P1_)
+      QR_Full += dt * b * computedPRdt(Em_, P1_)
 
       //      sum = QR_Full + QL_Full
       //      i = size - 2
@@ -68,16 +67,16 @@ class HaganLawsonSwayneSABRTransformedDensitySolver(spec: SABRModelSpec, forward
 
       var i = 0
       while (i < size) {
-        Q1(i) = (sqrt2 + 1) * Q1(i) - sqrt2 * Q1Half(i)
+        P1_(i) = (sqrt2 + 1) * P1_(i) - sqrt2 * Q1Half(i)
         i += 1
       }
-      QL_ = (sqrt2 + 1) * QL_Full - sqrt2 * QL_Half
-      QR_ = (sqrt2 + 1) * QR_Full - sqrt2 * QR_Half
+      PL_ = (sqrt2 + 1) * QL_Full - sqrt2 * QL_Half
+      PR_ = (sqrt2 + 1) * QR_Full - sqrt2 * QR_Half
       advanceEm(dt * (1 - 2 * b), Em_)
       //printSumQF(t)
-      Qtmp = Q0_
-      Q0_ = Q1
-      Q1 = Qtmp
+      Qtmp = P0_
+      P0_ = P1_
+      P1_ = Qtmp
       tIndex += 1
     }
 

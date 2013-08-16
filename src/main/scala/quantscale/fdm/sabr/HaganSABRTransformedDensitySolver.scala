@@ -6,15 +6,18 @@ import scala.Array
 
 /**
  * Date: 8/12/13
+ *
+ * TODO: rename Q in P, and the Q = P*h/(Fm+1-Fm)
  */
+
 class HaganSABRTransformedDensitySolver(spec: SABRModelSpec, forward: Double, T: Double, size: Int = 1000, timeSteps: Int = 1000 / 5, nDeviations: Double = 3.0) extends SABRDensitySolver {
-  private[sabr] var Q0_, Q1: Array[Double] = null
+  private[sabr] var P0_, P1_ : Array[Double] = null
   private[sabr] var Fmin = spec.b
   private[sabr] var Fmax = 0.0
   private[sabr] var zmin_, zmax_ = 0.0
   private[sabr] var h_ = 0.0
   private[sabr] var j0 = 0
-  private[sabr] var QL_, QR_ = 0.0
+  private[sabr] var PL_, PR_ = 0.0
   private[sabr] var dt_ = T / timeSteps
   private[sabr] var Cm_, Fm_, Gammam_, Em_, Em1Cache, Em2Cache: Array[Double] = null
   private[sabr] var tri1, tri0: TridiagonalMatrix = null
@@ -32,11 +35,13 @@ class HaganSABRTransformedDensitySolver(spec: SABRModelSpec, forward: Double, T:
 
   def h: Double = h_
 
-  def Q0: Array[Double] = Q0_
+  def P: Array[Double] = P0_
 
-  def QL = QL_
+  def Q(i: Integer) = P0_(i)/(Fm_(i+1)-Fm_(i))*h
 
-  def QR = QR_
+  def PL = PL_
+
+  def PR = PR_
 
   def dt = dt_
 
@@ -50,17 +55,17 @@ class HaganSABRTransformedDensitySolver(spec: SABRModelSpec, forward: Double, T:
 
   def printTimeStep(t: Double) {
     var str = ""
-    for (i <- 0 until Q0.length) {
-      str += t + " " + Fm(i) + " " + Q0(i) + " " + Em_(i) + "\n"
+    for (i <- 0 until P.length) {
+      str += t + " " + Fm(i) + " " + P(i) + " " + Em_(i) + "\n"
     }
     println(str)
   }
 
-  private[sabr] def computedQLdt(Em: Array[Double], P: Array[Double]): Double = {
+  private[sabr] def computedPLdt(Em: Array[Double], P: Array[Double]): Double = {
     return Cm_(1) / (Fm_(1) - Fm_(0)) * Em(1) * P(1)
   }
 
-  private[sabr] def computedQRdt(Em: Array[Double], P: Array[Double]): Double = {
+  private[sabr] def computedPRdt(Em: Array[Double], P: Array[Double]): Double = {
     return Cm_(size - 2) / (Fm_(size - 1) - Fm_(size - 2)) * Em(size - 2) * P(size - 2)
   }
 
@@ -74,78 +79,77 @@ class HaganSABRTransformedDensitySolver(spec: SABRModelSpec, forward: Double, T:
     } else {
       buildEmCache(dt, 0)
     }
-    Q0_ = computeQ()
-    Q1 = Array.ofDim(size)
-    QL_ = 0.0
-    QR_ = 0.0
+    P0_ = computeP()
+    P1_ = Array.ofDim(size)
+    PL_ = 0.0
+    PR_ = 0.0
     var t = T
     var indexRannacher = 0
     val rhs = Array.ofDim[Double](size)
     var tIndex = 0
 
     while (tIndex < timeSteps) {
-      //                        if (tIndex < 4) {
-      //                          printTimeStep(t)
-      //                          tIndex += 1
-      //                        }
+//                              if (tIndex < 4) {
+//                                printTimeStep(t)
+//                              }
       if (useRannacher && indexRannacher < 2) {
         t -= dt / 2
         advanceEm(dt / 2, Em_)
         computeSystem(dt, Em_, null, tri1, tri0) //will use dt/2 because of Crank
-        Q0_(0) = 0
-        Q0_(size - 1) = 0
-        solver.solve(tri1, Q0_, Q1)
-        QL_ += dt / 2 * Cm_(1) / (Fm_(1) - Fm_(0)) * Em_(1) * Q1(1)
-        QR_ += dt / 2 * Cm_(size - 2) / (Fm_(size - 1) - Fm_(size - 2)) * Em_(size - 2) * Q1(size - 2)
-        val Qtmp = Q0_
-        Q0_ = Q1
-        Q1 = Qtmp
+        P0_(0) = 0
+        P0_(size - 1) = 0
+        solver.solve(tri1, P0_, P1_)
+        PL_ += dt / 2 * Cm_(1) / (Fm_(1) - Fm_(0)) * Em_(1) * P1_(1)
+        PR_ += dt / 2 * Cm_(size - 2) / (Fm_(size - 1) - Fm_(size - 2)) * Em_(size - 2) * P1_(size - 2)
+        val Qtmp = P0_
+        P0_ = P1_
+        P1_ = Qtmp
         t -= dt / 2
         advanceEm(dt / 2, Em_)
         computeSystem(dt, Em_, null, tri1, tri0) //will use dt/2 because of Crank
-        Q0_(0) = 0
-        Q0_(size - 1) = 0
-        solver.solve(tri1, Q0_, Q1)
-        QL_ += dt / 2 * computedQLdt(Em_, Q1)
-        QR_ += dt / 2 * computedQRdt(Em_, Q1)
+        P0_(0) = 0
+        P0_(size - 1) = 0
+        solver.solve(tri1, P0_, P1_)
+        PL_ += dt / 2 * computedPLdt(Em_, P1_)
+        PR_ += dt / 2 * computedPRdt(Em_, P1_)
         indexRannacher += 1
       } else {
         t -= dt
         Array.copy(Em_, 0, M0, 0, size)
         advanceEm(dt, Em_)
         computeSystem(dt, Em_, M0, tri1, tri0)
-        Q0_(0) = 0
-        Q0_(size - 1) = 0
-        tri0.multiply(Q0_, rhs)
-        solver.solve(tri1, rhs, Q1)
+        P0_(0) = 0
+        P0_(size - 1) = 0
+        tri0.multiply(P0_, rhs)
+        solver.solve(tri1, rhs, P1_)
 
-        QL_ += dt / 2 * Cm_(1) / (Fm_(1) - Fm_(0)) * (Em_(1) * Q1(1) + M0(1) * Q0(1))
-        QR_ += dt / 2 * Cm_(size - 2) / (Fm_(size - 1) - Fm_(size - 2)) * (Em_(size - 2) * Q1(size - 2) + M0(size - 2) * Q0(size - 2))
+        PL_ += dt / 2 * Cm_(1) / (Fm_(1) - Fm_(0)) * (Em_(1) * P1_(1) + M0(1) * P(1))
+        PR_ += dt / 2 * Cm_(size - 2) / (Fm_(size - 1) - Fm_(size - 2)) * (Em_(size - 2) * P1_(size - 2) + M0(size - 2) * P(size - 2))
       }
       // printSumQF(t)
 
-      val Qtmp = Q0_
-      Q0_ = Q1
-      Q1 = Qtmp
+      val Qtmp = P0_
+      P0_ = P1_
+      P1_ = Qtmp
       tIndex += 1
     }
   }
 
 
-  def printSumQF(name: String, t: Double, Q1: Array[Double], QL: Double, QR: Double) {
-    var sumQ = QR + QL
-    var sumF = Fmin * QL + Fmax * QR
+  def printSumPF(name: String, t: Double, Q1: Array[Double], PL: Double, PR: Double) {
+    var sumQ = PR + PL
+    var sumF = Fmin * PL + Fmax * PR
     var i = size - 2
     while (i > 0) {
       sumQ += h * Q1(i)
       sumF += h * Q1(i) * Fm_(i)
       i -= 1
     }
-    println("t=" + t + " " + name + " Q=" + sumQ + " F=" + sumF + " Fj0=" + Fm_(j0) + " QL_=" + QL + " QR_=" + QR)
+    println("t=" + t + " " + name + " P=" + sumQ + " F=" + sumF + " Fj0=" + Fm_(j0) + " PL_=" + PL + " PR_=" + PR)
   }
 
   def price(isCall: Boolean, strike: Double): Double = {
-    if (Q0_ == null) {
+    if (P0_ == null) {
       solve()
     }
     if (isCall) {
@@ -162,10 +166,10 @@ class HaganSABRTransformedDensitySolver(spec: SABRModelSpec, forward: Double, T:
         val ztilde = zmin_ + k * h
         val ftilde = computeFFromY(computeYFromZ(ztilde))
         val term = (ftilde - strike)
-        var price = 0.5 * term * term * Q0_(k) + (Fmax - strike) * QR_
+        var price = 0.5 * term * term * P0_(k) + (Fmax - strike) * PR_
         k += 1
         while (k < size - 1) {
-          price += (Fm_(k) - strike) * h * Q0_(k)
+          price += (Fm_(k) - strike) * h * P0_(k)
           k += 1
         }
         return price
@@ -184,10 +188,10 @@ class HaganSABRTransformedDensitySolver(spec: SABRModelSpec, forward: Double, T:
         val ztilde = zmin_ + k * h
         val ftilde = computeFFromY(computeYFromZ(ztilde))
         val term = strike - ftilde
-        var price = 0.5 * term * term * Q0_(k) + (strike - Fmin) * QL_
+        var price = 0.5 * term * term * P0_(k) + (strike - Fmin) * PL_
         k -= 1
         while (k > 0) {
-          price += (strike - Fm_(k)) * h * Q0_(k)
+          price += (strike - Fm_(k)) * h * P0_(k)
           k -= 1
         }
         return price
@@ -244,7 +248,7 @@ class HaganSABRTransformedDensitySolver(spec: SABRModelSpec, forward: Double, T:
     }
   }
 
-  private[sabr] def computeQ(): Array[Double] = {
+  private[sabr] def computeP(): Array[Double] = {
     val Q = Array.ofDim[Double](size)
     Q(j0) = 1.0 / h
     return Q

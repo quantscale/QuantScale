@@ -12,75 +12,74 @@ class HaganLMG3SABRTransformedDensitySolver(spec: SABRModelSpec, forward: Double
   override def solve() {
     tri1 = new TridiagonalMatrix(size) //Full
     buildEmCache(dt / 3, 0)
-    Q0_ = computeQ()
-    Q1 = Array.ofDim(size)
+    P0_ = computeP()
+    P1_ = Array.ofDim(size)
     val Q1Third = Array.ofDim[Double](size)
     val Q1ThirdTmp = Array.ofDim[Double](size)
     val Q1Half = Array.ofDim[Double](size)
-    QL_ = 0.0
-    QR_ = 0.0
+    PL_ = 0.0
+    PR_ = 0.0
     var t = T
-    var Qtmp = Q0_
+    var Qtmp = P0_
     var tIndex = 0
 
     while (tIndex < timeSteps) {
-      //                  if (tIndex < 4) {
-      //              printTimeStep(t)
-      //              tIndex += 1
-      //            }
+//                        if (tIndex < 4) {
+//                    printTimeStep(t)
+//                  }
       t -= dt / 3
 
       advanceEm(dt / 3, Em_)
       computeSystem(dt / 3, Em_, tri1)
-      Q0_(0) = 0
-      Q0_(size - 1) = 0
-      solver.solve(tri1, Q0_, Q1ThirdTmp)
-      var QL_ThirdPart = QL_ + dt / 3 * computedQLdt(Em_, Q1ThirdTmp)
-      var QR_ThirdPart = QR_ + dt / 3 * computedQRdt(Em_, Q1ThirdTmp)
+      P0_(0) = 0
+      P0_(size - 1) = 0
+      solver.solve(tri1, P0_, Q1ThirdTmp)
+      var QL_ThirdPart = PL_ + dt / 3 * computedPLdt(Em_, Q1ThirdTmp)
+      var QR_ThirdPart = PR_ + dt / 3 * computedPRdt(Em_, Q1ThirdTmp)
       var QL_HalfPart = QL_ThirdPart
       var QR_HalfPart = QR_ThirdPart
-      val Q0_Init = Q0_
-      Q0_ = Q1ThirdTmp
+      val Q0_Init = P0_
+      P0_ = Q1ThirdTmp
 
       t -= dt / 3
       advanceEm(dt / 3, Em_)
       computeSystem(dt / 3, Em_, tri1)
-      Q0_(0) = 0
-      Q0_(size - 1) = 0
-      solver.solve(tri1, Q0_, Q1Third)
-      QL_ThirdPart += dt / 3 * computedQLdt(Em_, Q1Third)
-      QR_ThirdPart += dt / 3 * computedQRdt(Em_, Q1Third)
-      Q0_ = Q1Third
+      P0_(0) = 0
+      P0_(size - 1) = 0
+      solver.solve(tri1, P0_, Q1Third)
+      QL_ThirdPart += dt / 3 * computedPLdt(Em_, Q1Third)
+      QR_ThirdPart += dt / 3 * computedPRdt(Em_, Q1Third)
+      P0_ = Q1Third
 
       t -= dt / 3
       advanceEm(dt / 3, Em_)
       computeSystem(dt / 3, Em_, tri1)
-      Q0_(0) = 0
-      Q0_(size - 1) = 0
-      solver.solve(tri1, Q0_, Q1Third)
-      QL_ThirdPart += dt / 3 * computedQLdt(Em_, Q1Third)
-      QR_ThirdPart += dt / 3 * computedQRdt(Em_, Q1Third)
+      P0_(0) = 0
+      P0_(size - 1) = 0
+      solver.solve(tri1, P0_, Q1Third)
+      QL_ThirdPart += dt / 3 * computedPLdt(Em_, Q1Third)
+      QR_ThirdPart += dt / 3 * computedPRdt(Em_, Q1Third)
 
-      Q0_ = Q1ThirdTmp
+      P0_ = Q1ThirdTmp
       computeSystem(2 * dt / 3, Em_, tri1)
-      Q0_(0) = 0
-      Q0_(size - 1) = 0
-      solver.solve(tri1, Q0_, Q1Half)
-      QL_HalfPart += 2 * dt / 3 * computedQLdt(Em_, Q1Half)
-      QR_HalfPart += 2 * dt / 3 * computedQRdt(Em_, Q1Half)
+      P0_(0) = 0
+      P0_(size - 1) = 0
+      solver.solve(tri1, P0_, Q1Half)
+      QL_HalfPart += 2 * dt / 3 * computedPLdt(Em_, Q1Half)
+      QR_HalfPart += 2 * dt / 3 * computedPRdt(Em_, Q1Half)
 
-      Q0_ = Q0_Init
+      P0_ = Q0_Init
       computeSystem(dt, Em_, tri1)
-      Q0_(0) = 0
-      Q0_(size - 1) = 0
-      solver.solve(tri1, Q0_, Q1)
+      P0_(0) = 0
+      P0_(size - 1) = 0
+      solver.solve(tri1, P0_, P1_)
 
-      QL_ += 4.5 * QL_ThirdPart - 4.5 * QL_HalfPart + dt * computedQLdt(Em_, Q1)
-      QR_ += 4.5 * QR_ThirdPart - 4.5 * QR_HalfPart + dt * computedQRdt(Em_, Q1)
+      PL_ += 4.5 * QL_ThirdPart - 4.5 * QL_HalfPart + dt * computedPLdt(Em_, P1_)
+      PR_ += 4.5 * QR_ThirdPart - 4.5 * QR_HalfPart + dt * computedPRdt(Em_, P1_)
 
       var i = 0
       while (i < size) {
-        Q1(i) = 4.5 * Q1Third(i) - 4.5 * Q1Half(i) + Q1(i)
+        P1_(i) = 4.5 * Q1Third(i) - 4.5 * Q1Half(i) + P1_(i)
         i += 1
       }
 
@@ -104,9 +103,9 @@ class HaganLMG3SABRTransformedDensitySolver(spec: SABRModelSpec, forward: Double
       //      println("t=" + t + " LMG3 Q=" + sumQ + " F=" + sumF + " Fj0=" + F(j0)+" QL_="+QL+" QR_="+QR)
 
       //      M0 = M1
-      Qtmp = Q0_
-      Q0_ = Q1
-      Q1 = Qtmp
+      Qtmp = P0_
+      P0_ = P1_
+      P1_ = Qtmp
       tIndex += 1
     }
   }

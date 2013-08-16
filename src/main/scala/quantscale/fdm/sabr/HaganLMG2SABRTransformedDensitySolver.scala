@@ -10,55 +10,54 @@ class HaganLMG2SABRTransformedDensitySolver(spec: SABRModelSpec, forward: Double
   override def solve() {
     tri1 = new TridiagonalMatrix(size) //Full
     buildEmCache(dt / 2, 0)
-    Q0_ = computeQ()
-    Q1 = Array.ofDim(size)
+    P0_ = computeP()
+    P1_ = Array.ofDim(size)
     val Q1Half = Array.ofDim[Double](size)
-    QL_ = 0.0
-    QR_ = 0.0
+    PL_ = 0.0
+    PR_ = 0.0
     var t = T
     //    var rhs = Array.ofDim[Double](size)
     var tIndex = 0
     while (tIndex < timeSteps) {
-      //       if (tIndex < 4) {
-      //        printTimeStep(t)
-      //        tIndex += 1
-      //      }
+//             if (tIndex < 4) {
+//              printTimeStep(t)
+//            }
       t -= dt / 2
       //      System.arraycopy(M0, 0, M1, 0, size)
       advanceEm(dt / 2, Em_)
       computeSystem(dt / 2, Em_, tri1)
-      Q0_(0) = 0
-      Q0_(size - 1) = 0
-      solver.solve(tri1, Q0_, Q1Half)
-      var QL_Part = dt / 2 * computedQLdt(Em_, Q1Half)
-      var QR_Part = dt / 2 * computedQRdt(Em_, Q1Half)
-      val Q0_Init = Q0_
-      Q0_ = Q1Half
+      P0_(0) = 0
+      P0_(size - 1) = 0
+      solver.solve(tri1, P0_, Q1Half)
+      var QL_Part = dt / 2 * computedPLdt(Em_, Q1Half)
+      var QR_Part = dt / 2 * computedPRdt(Em_, Q1Half)
+      val Q0_Init = P0_
+      P0_ = Q1Half
 
       t -= dt / 2
       advanceEm(dt / 2, Em_)
       computeSystem(dt / 2, Em_, tri1)
-      Q0_(0) = 0
-      Q0_(size - 1) = 0
-      solver.solve(tri1, Q0_, Q1Half)
-      QL_Part += dt / 2 * computedQLdt(Em_, Q1Half)
-      QR_Part += dt / 2 * computedQRdt(Em_, Q1Half)
+      P0_(0) = 0
+      P0_(size - 1) = 0
+      solver.solve(tri1, P0_, Q1Half)
+      QL_Part += dt / 2 * computedPLdt(Em_, Q1Half)
+      QR_Part += dt / 2 * computedPRdt(Em_, Q1Half)
 
-      Q0_ = Q0_Init
+      P0_ = Q0_Init
       computeSystem(dt, Em_, tri1)
-      Q0_(0) = 0
-      Q0_(size - 1) = 0
-      solver.solve(tri1, Q0_, Q1)
+      P0_(0) = 0
+      P0_(size - 1) = 0
+      solver.solve(tri1, P0_, P1_)
 
-      QL_ += 2 * QL_Part - dt * computedQLdt(Em_, Q1)
-      QR_ += 2 * QR_Part - dt * computedQRdt(Em_, Q1)
+      PL_ += 2 * QL_Part - dt * computedPLdt(Em_, P1_)
+      PR_ += 2 * QR_Part - dt * computedPRdt(Em_, P1_)
 
       var i = 0
       while (i < size) {
-        Q1(i) = 2 * Q1Half(i) - Q1(i)
+        P1_(i) = 2 * Q1Half(i) - P1_(i)
         i += 1
       }
-
+      //printSumQF("LMG2",t,Q1,QL_,QR_)
       //check sum
       //      var sum = QR_+QL
       //      i = size-2
@@ -68,9 +67,9 @@ class HaganLMG2SABRTransformedDensitySolver(spec: SABRModelSpec, forward: Double
       //      }
       //      println("t="+t+" LMG2 Q="+sum)
       //      M0 = M1
-      val Qtmp = Q0_
-      Q0_ = Q1
-      Q1 = Qtmp
+      val Qtmp = P0_
+      P0_ = P1_
+      P1_ = Qtmp
       tIndex += 1
     }
 

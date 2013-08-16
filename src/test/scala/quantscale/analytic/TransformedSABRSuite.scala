@@ -192,8 +192,8 @@ class TransformedSABRSuite extends FunSuite {
     val tte = 1.0;
     val df = 1.0
     val xSteps = 500
-    val tSteps = 10
-    val nDeviation = 3.0
+    val tSteps = 5
+    val nDeviation = 4.0
     val spec = new SABRModelSpec(alpha, beta, nu, rho)
     var pde = new HaganSABRTransformedDensitySolver(spec, forward, tte, xSteps, tSteps, nDeviation)
     pde.useRannacher = false
@@ -222,9 +222,9 @@ class TransformedSABRSuite extends FunSuite {
       for ((name, pde) <- pdeMap) {
         pde.solve()
         val j0 = pde.indexForward
-        val Qforward = pde.Q0(j0)
-        val QL = pde.QL
-        val QR = pde.QR
+        val Qforward = pde.P(j0)
+        val QL = pde.PL
+        val QR = pde.PR
 
         val price = pde.price(false,forward)
         println(f"$name & $price%2.12f & $Qforward%2.12f & $QL%2.12f & $QR%2.12f\\\\")
@@ -253,7 +253,7 @@ class TransformedSABRSuite extends FunSuite {
     val refPDE = new HaganLMG3SABRTransformedDensitySolver(spec, forward, tte, 1280*4, 1280 * 4, FmaxTruncation)
 
     refPDE.solve()
-    val Qspline = CubicSpline.makeCubicSpline(refPDE.Fm, refPDE.Q0)
+    val Qspline = CubicSpline.makeCubicSpline(refPDE.Fm, refPDE.P)
 
     var solver = new Li2011SORDRBlackVolatilitySolver(1e-12)
     val schemes = Array("CN", "RAN", "LMG2", "LMG3", "LS", "TRBDF2", "TRBDF3", "RE")
@@ -299,7 +299,7 @@ class TransformedSABRSuite extends FunSuite {
     val refPDE = new HaganLMG3SABRTransformedDensitySolver(spec, forward, tte, 1280*4, 1280 * 4, FmaxTruncation)
 
     refPDE.solve()
-    val Qspline = CubicSpline.makeCubicSpline(refPDE.Fm, refPDE.Q0)
+    val Qspline = CubicSpline.makeCubicSpline(refPDE.Fm, refPDE.P)
 
     var solver = new Li2011SORDRBlackVolatilitySolver(1e-12)
     val schemes = Array("CN", "RAN", "LMG2", "LMG3", "LS", "TRBDF2", "TRBDF3", "RE")
@@ -337,7 +337,7 @@ class TransformedSABRSuite extends FunSuite {
     var maxError = 0.0
     var Fmax = 0.0
     val F = solver.Fm
-    val Q0 = solver.Q0
+    val Q0 = solver.P
 
     for (i <- 2 until F.size - 2) {
       val Qref = Qspline.value(F(i))
@@ -465,12 +465,12 @@ class TransformedSABRSuite extends FunSuite {
             cn.solve()
             val endTime = System.nanoTime()
             val elapsed = (endTime - startTime) * 1e-9
-            val err = computeMaxError(forward, cn.Fm, cn.Q0, previousQ)
+            val err = computeMaxError(forward, cn.Fm, cn.P, previousQ)
             val value: Double = err._1
             val diff: Double = err._2
             val ratio = previousDiff / diff
             buffer += f" $timeStep & $value%2.8f & $diff%2.1e & $ratio%2.1f & $elapsed%2.1e\\\\\n"
-            previousQ = cn.Q0
+            previousQ = cn.P
             previousDiff = diff
 
           }
@@ -562,12 +562,12 @@ class TransformedSABRSuite extends FunSuite {
             cn.solve()
             val endTime = System.nanoTime()
             val elapsed = (endTime - startTime) * 1e-9
-            val err = computeMaxError(forward, cn.Fm, cn.Q0, previousQ)
+            val err = computeMaxError(forward, cn.Fm, cn.P, previousQ)
             val value: Double = err._1
             val diff: Double = err._2
             val ratio = previousDiff / diff
             buffer += f" $timeStep & $value%2.8f & $diff%2.1e & $ratio%2.1f & $elapsed%2.1e\\\\\n"
-            previousQ = cn.Q0
+            previousQ = cn.P
             previousDiff = diff
 
           }
@@ -622,6 +622,72 @@ class TransformedSABRSuite extends FunSuite {
           print(buffer)
 
         }
+      }
+    }
+  }
+
+  test("HaganDensitySimple") {
+    val alpha = 0.35;
+    val nu = 1.0;
+    val beta = 0.25;
+    val rho = -0.1;
+    val forward = 1.0;
+    val tte = 1.0;
+    val df = 1.0
+    val xSteps = 500
+    val tSteps = 5
+    val FmaxTruncation = 3
+    val spec = new SABRModelSpec(alpha, beta, nu, rho)
+    var solver = new Li2011SORDRBlackVolatilitySolver(1e-12)
+    var pde = new HaganSABRTransformedDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
+    pde.useRannacher = false
+    var pdeMap = Map("CN" -> pde)
+    pde = new HaganSABRTransformedDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
+    pde.useRannacher = true
+    pdeMap += "RAN" -> pde
+    pdeMap += "LMG2" -> new HaganLMG2SABRTransformedDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
+    pdeMap += "LMG3" -> new HaganLMG3SABRTransformedDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
+    pdeMap += "TRBDF2" -> new HaganTRBDF2SABRTransformedDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
+    pdeMap += "RE" -> new HaganRichardsonEulerSABRTransformedDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
+    pdeMap += "LS" -> new HaganLawsonSwayneSABRTransformedDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
+
+    for ((name, pde) <- pdeMap) {
+      pde.solve()
+      println(name + " " + pde.computeCourantNumber + " " + pde.h)
+    }
+    println("densities")
+    //density
+    println("Scheme Strike Density")
+    val strikeList = pde.Fm
+    for (i <- 1 until strikeList.length-1) {
+      val strike = strikeList(i)
+      val eps = 1e-3 * strike
+      val isCall = strike >= forward
+      val haganVolUp = SABRVanilla.impliedVolatilityHagan(spec, forward, strike + eps, tte)
+      val haganVol = SABRVanilla.impliedVolatilityHagan(spec, forward, strike, tte)
+      val haganVolDown = SABRVanilla.impliedVolatilityHagan(spec, forward, strike - eps, tte)
+      var variance = haganVolUp * haganVolUp * tte
+      val callUp = BlackScholesVanillaEuropean.priceEuropeanVanilla(isCall, strike + eps, forward, variance, 1.0, df)
+      variance = haganVol * haganVol * tte
+      val call = BlackScholesVanillaEuropean.priceEuropeanVanilla(isCall, strike, forward, variance, 1.0, df)
+      variance = haganVolDown * haganVolDown * tte
+      val callDown = BlackScholesVanillaEuropean.priceEuropeanVanilla(isCall, strike - eps, forward, variance, 1.0, df)
+      val densityHagan = (callUp - 2 * call + callDown) / (eps * eps)
+
+      println(f"Hagan $strike%2.4f $densityHagan%2.4e")
+
+      var normalVolUp = SABRVanilla.normalVolatilityHagan2013(spec, forward, strike + eps, tte)
+      var normalVol = SABRVanilla.normalVolatilityHagan2013(spec, forward, strike, tte)
+      var normalVolDown = SABRVanilla.normalVolatilityHagan2013(spec, forward, strike - eps, tte)
+      val callUpNormal = BachelierVanillaEuropean.price(isCall, strike + eps, forward, normalVolUp, tte)
+      val callNormal = BachelierVanillaEuropean.price(isCall, strike, forward, normalVol, tte)
+      val callDownNormal = BachelierVanillaEuropean.price(isCall, strike - eps, forward, normalVolDown, tte)
+      val densityNormal = (callUpNormal - 2 * callNormal + callDownNormal) / (eps * eps)
+
+      for ((name, pde) <- pdeMap) {
+        val Q = pde.Q(i)
+
+        println(f"$name $strike%2.4f $Q%2.2e")
       }
     }
   }
