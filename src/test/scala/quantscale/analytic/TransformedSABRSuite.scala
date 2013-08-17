@@ -192,7 +192,7 @@ class TransformedSABRSuite extends FunSuite {
     val tte = 1.0;
     val df = 1.0
     val xSteps = 500
-    val tSteps = 5
+    val tSteps = 320
     val nDeviation = 4.0
     val spec = new SABRModelSpec(alpha, beta, nu, rho)
     var pde = new HaganSABRTransformedDensitySolver(spec, forward, tte, xSteps, tSteps, nDeviation)
@@ -635,21 +635,21 @@ class TransformedSABRSuite extends FunSuite {
     val tte = 1.0;
     val df = 1.0
     val xSteps = 500
-    val tSteps = 5
-    val FmaxTruncation = 3
+    val tSteps = 80
+    val FmaxTruncation = 4
     val spec = new SABRModelSpec(alpha, beta, nu, rho)
     var solver = new Li2011SORDRBlackVolatilitySolver(1e-12)
     var pde = new HaganSABRTransformedDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
     pde.useRannacher = false
     var pdeMap = Map("CN" -> pde)
-    pde = new HaganSABRTransformedDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
-    pde.useRannacher = true
-    pdeMap += "RAN" -> pde
-    pdeMap += "LMG2" -> new HaganLMG2SABRTransformedDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
-    pdeMap += "LMG3" -> new HaganLMG3SABRTransformedDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
-    pdeMap += "TRBDF2" -> new HaganTRBDF2SABRTransformedDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
-    pdeMap += "RE" -> new HaganRichardsonEulerSABRTransformedDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
-    pdeMap += "LS" -> new HaganLawsonSwayneSABRTransformedDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
+//    pde = new HaganSABRTransformedDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
+//    pde.useRannacher = true
+//    pdeMap += "RAN" -> pde
+//    pdeMap += "LMG2" -> new HaganLMG2SABRTransformedDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
+//    pdeMap += "LMG3" -> new HaganLMG3SABRTransformedDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
+//    pdeMap += "TRBDF2" -> new HaganTRBDF2SABRTransformedDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
+//    pdeMap += "RE" -> new HaganRichardsonEulerSABRTransformedDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
+//    pdeMap += "LS" -> new HaganLawsonSwayneSABRTransformedDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
 
     for ((name, pde) <- pdeMap) {
       pde.solve()
@@ -687,7 +687,7 @@ class TransformedSABRSuite extends FunSuite {
       for ((name, pde) <- pdeMap) {
         val Q = pde.Q(i)
 
-        println(f"$name $strike%2.4f $Q%2.2e")
+        println(f"$name $strike%2.4f $Q%2.4e")
       }
     }
   }

@@ -3,28 +3,23 @@
   <component name="ChangeListManager">
     <list default="true" id="d7b992c4-8484-4e1f-bd9b-b629a460f079" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganCNBDF3SABRTransformedDensitySolver.scala" afterPath="$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganCNBDF3SABRTransformedDensitySolver.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganLMG2SABRTransformedDensitySolver.scala" afterPath="$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganLMG2SABRTransformedDensitySolver.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganLMG3SABRTransformedDensitySolver.scala" afterPath="$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganLMG3SABRTransformedDensitySolver.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganLawsonSwayneSABRTransformedDensitySolver.scala" afterPath="$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganLawsonSwayneSABRTransformedDensitySolver.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganRichardsonEulerSABRTransformedDensitySolver.scala" afterPath="$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganRichardsonEulerSABRTransformedDensitySolver.scala" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganSABRTransformedDensitySolver.scala" afterPath="$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganSABRTransformedDensitySolver.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganTRBDF2SABRTransformedDensitySolver.scala" afterPath="$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganTRBDF2SABRTransformedDensitySolver.scala" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/scala/quantscale/analytic/TransformedSABRSuite.scala" afterPath="$PROJECT_DIR$/src/test/scala/quantscale/analytic/TransformedSABRSuite.scala" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="QuantScale.iws" />
     <ignored path=".idea/workspace.xml" />
-    <file path="/SBT" changelist="d7b992c4-8484-4e1f-bd9b-b629a460f079" time="1376686911088" ignored="false" />
+    <file path="/SBT" changelist="d7b992c4-8484-4e1f-bd9b-b629a460f079" time="1376732896199" ignored="false" />
     <file path="/SABRSuite.scala" changelist="d7b992c4-8484-4e1f-bd9b-b629a460f079" time="1376409690969" ignored="false" />
     <file path="/build.sbt" changelist="d7b992c4-8484-4e1f-bd9b-b629a460f079" time="1371654620659" ignored="false" />
     <file path="/HaganCNBDF3SABRDensitySolver.scala" changelist="d7b992c4-8484-4e1f-bd9b-b629a460f079" time="1371812841344" ignored="false" />
     <file path="/HaganCNBDF2SABRDensitySolver.scala" changelist="d7b992c4-8484-4e1f-bd9b-b629a460f079" time="1371810227911" ignored="false" />
     <file path="/HaganTRBDF2SABRDensitySolver.scala" changelist="d7b992c4-8484-4e1f-bd9b-b629a460f079" time="1371813420497" ignored="false" />
-    <file path="/HaganSABRDensitySolver.scala" changelist="d7b992c4-8484-4e1f-bd9b-b629a460f079" time="1375105423449" ignored="false" />
+    <file path="/HaganSABRDensitySolver.scala" changelist="d7b992c4-8484-4e1f-bd9b-b629a460f079" time="1376736238856" ignored="false" />
     <file path="/HaganADESABRDensitySolver.scala" changelist="d7b992c4-8484-4e1f-bd9b-b629a460f079" time="1371831044292" ignored="false" />
-    <file path="/Dummy.txt" changelist="d7b992c4-8484-4e1f-bd9b-b629a460f079" time="1376686910805" ignored="false" />
+    <file path="/Dummy.txt" changelist="d7b992c4-8484-4e1f-bd9b-b629a460f079" time="1376732896193" ignored="false" />
     <file path="/HaganLawsonSwayneSABRDensitySolver.scala" changelist="d7b992c4-8484-4e1f-bd9b-b629a460f079" time="1375104419851" ignored="false" />
-    <file path="/HaganSABRTransformedDensitySolver.scala" changelist="d7b992c4-8484-4e1f-bd9b-b629a460f079" time="1376687665727" ignored="false" />
+    <file path="/HaganSABRTransformedDensitySolver.scala" changelist="d7b992c4-8484-4e1f-bd9b-b629a460f079" time="1376733003628" ignored="false" />
     <file path="/TransformedSABRSuite.scala" changelist="d7b992c4-8484-4e1f-bd9b-b629a460f079" time="1376687796561" ignored="false" />
     <file path="/fragment.java" changelist="d7b992c4-8484-4e1f-bd9b-b629a460f079" time="1376686985444" ignored="false" />
     <file path="/HaganLawsonSwayneTransformedSABRDensitySolver.scala" changelist="d7b992c4-8484-4e1f-bd9b-b629a460f079" time="1376327689522" ignored="false" />
@@ -51,38 +46,6 @@
     <disable_hints />
   </component>
   <component name="DebuggerManager">
-    <line_breakpoints default_suspend_policy="SuspendAll" default_condition_enabled="true">
-      <breakpoint url="file://$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganADESABRDensitySolver.scala" line="82" class="quantscale.fdm.sabr.HaganADESABRDensitySolver" package="quantscale.fdm.sabr">
-        <option name="ENABLED" value="true" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="REMOVE_AFTER_HIT" value="false" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="SUSPEND" value="true" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="true" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganSABRTransformedDensitySolver.scala" line="182" class="quantscale.fdm.sabr.HaganSABRTransformedDensitySolver" package="quantscale.fdm.sabr">
-        <option name="ENABLED" value="true" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="REMOVE_AFTER_HIT" value="false" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="SUSPEND" value="true" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="true" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
-    </line_breakpoints>
     <ui_properties default_suspend_policy="SuspendAll" default_condition_enabled="true" />
     <breakpoint_any default_suspend_policy="SuspendAll" default_condition_enabled="true">
       <breakpoint>
@@ -120,6 +83,68 @@
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
     </breakpoint_any>
+    <line_breakpoints default_suspend_policy="SuspendAll" default_condition_enabled="true">
+      <breakpoint url="file://$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganADESABRDensitySolver.scala" line="82" class="quantscale.fdm.sabr.HaganADESABRDensitySolver" package="quantscale.fdm.sabr">
+        <option name="ENABLED" value="true" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="REMOVE_AFTER_HIT" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="SUSPEND" value="true" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="true" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
+      <breakpoint url="file://$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganSABRTransformedDensitySolver.scala" line="182" class="quantscale.fdm.sabr.HaganSABRTransformedDensitySolver" package="quantscale.fdm.sabr">
+        <option name="ENABLED" value="true" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="REMOVE_AFTER_HIT" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="SUSPEND" value="true" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="true" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
+      <breakpoint url="file://$PROJECT_DIR$/src/test/scala/quantscale/analytic/TransformedSABRSuite.scala" line="628" class="quantscale.analytic.TransformedSABRSuite" package="quantscale.analytic">
+        <option name="ENABLED" value="true" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="REMOVE_AFTER_HIT" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="SUSPEND" value="true" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="true" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
+      <breakpoint url="file://$PROJECT_DIR$/src/test/scala/quantscale/analytic/TransformedSABRSuite.scala" line="219" class="quantscale.analytic.TransformedSABRSuite" package="quantscale.analytic">
+        <option name="ENABLED" value="true" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="REMOVE_AFTER_HIT" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="SUSPEND" value="true" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="true" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
+    </line_breakpoints>
     <breakpoint_rules />
     <ui_properties />
   </component>
@@ -129,37 +154,10 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="HaganSABRTransformedDensitySolver.scala" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganSABRTransformedDensitySolver.scala">
+      <file leaf-file-name="HaganLMG2SABRDensitySolver.scala" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganLMG2SABRDensitySolver.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="91" column="0" selection-start="2387" selection-end="2519" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="HaganTRBDF2SABRTransformedDensitySolver.scala" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganTRBDF2SABRTransformedDensitySolver.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="29" column="0" selection-start="951" selection-end="1053" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="HaganLMG2SABRTransformedDensitySolver.scala" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganLMG2SABRTransformedDensitySolver.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="23" column="15" selection-start="738" selection-end="806" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="HaganSABRDensitySolver.scala" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganSABRDensitySolver.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="327" column="6" selection-start="11024" selection-end="11024" vertical-scroll-proportion="0.0">
+            <state line="6" column="6" selection-start="147" selection-end="147" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -174,12 +172,88 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="HaganCNBDF3SABRTransformedDensitySolver.scala" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganCNBDF3SABRTransformedDensitySolver.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="25" column="0" selection-start="784" selection-end="886" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="TransformedSABRSuite.scala" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/test/scala/quantscale/analytic/TransformedSABRSuite.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="661" column="41" selection-start="25722" selection-end="25722" vertical-scroll-proportion="0.27272728">
+            <state line="579" column="70" selection-start="22358" selection-end="22358" vertical-scroll-proportion="-0.15815085">
               <folding>
-                <element signature="e#25484#25576#0" expanded="false" />
+                <element signature="e#613#3312#0" expanded="false" />
+                <element signature="e#2199#2246#0" expanded="false" />
+                <element signature="e#2514#3308#0" expanded="false" />
+                <element signature="e#2544#3302#0" expanded="false" />
+                <element signature="e#2586#3293#0" expanded="false" />
+                <element signature="e#3329#3979#0" expanded="false" />
+                <element signature="e#4003#4814#0" expanded="false" />
+                <element signature="e#4834#5357#0" expanded="false" />
+                <element signature="e#5384#7264#0" expanded="false" />
+                <element signature="e#6934#7260#0" expanded="false" />
+                <element signature="e#7293#9548#0" expanded="false" />
+                <element signature="e#9587#11308#0" expanded="false" />
+                <element signature="e#10472#11304#0" expanded="false" />
+                <element signature="e#10655#11298#0" expanded="false" />
+                <element signature="e#10695#11290#0" expanded="false" />
+                <element signature="e#10761#11256#0" expanded="false" />
+                <element signature="e#11344#13071#0" expanded="false" />
+                <element signature="e#12235#13067#0" expanded="false" />
+                <element signature="e#12418#13061#0" expanded="false" />
+                <element signature="e#12458#13053#0" expanded="false" />
+                <element signature="e#12524#13019#0" expanded="false" />
+                <element signature="e#13075#13425#0" expanded="false" />
+                <element signature="e#13429#13881#0" expanded="false" />
+                <element signature="e#13653#13849#0" expanded="false" />
+                <element signature="e#13789#13843#0" expanded="false" />
+                <element signature="e#13915#15400#0" expanded="false" />
+                <element signature="e#14707#15396#0" expanded="false" />
+                <element signature="e#14804#15390#0" expanded="false" />
+                <element signature="e#14862#15382#0" expanded="false" />
+                <element signature="e#14902#15348#0" expanded="false" />
+                <element signature="e#15456#16958#0" expanded="false" />
+                <element signature="e#16265#16954#0" expanded="false" />
+                <element signature="e#16362#16948#0" expanded="false" />
+                <element signature="e#16420#16940#0" expanded="false" />
+                <element signature="e#16460#16906#0" expanded="false" />
+                <element signature="e#17000#18753#0" expanded="false" />
+                <element signature="e#17676#18749#0" expanded="false" />
+                <element signature="e#17786#18743#0" expanded="false" />
+                <element signature="e#17826#18735#0" expanded="false" />
+                <element signature="e#18058#18700#0" expanded="false" />
+                <element signature="e#18791#20559#0" expanded="false" />
+                <element signature="e#19467#20555#0" expanded="false" />
+                <element signature="e#19577#20549#0" expanded="false" />
+                <element signature="e#19617#20541#0" expanded="false" />
+                <element signature="e#19844#20506#0" expanded="false" />
+                <element signature="e#20598#22357#0" expanded="false" />
+                <element signature="e#21280#22353#0" expanded="false" />
+                <element signature="e#21390#22347#0" expanded="false" />
+                <element signature="e#21430#22339#0" expanded="false" />
+                <element signature="e#21662#22304#0" expanded="false" />
+                <element signature="e#22392#24166#0" expanded="false" />
+                <element signature="e#23074#24162#0" expanded="false" />
+                <element signature="e#23184#24156#0" expanded="false" />
+                <element signature="e#23224#24148#0" expanded="false" />
+                <element signature="e#23451#24113#0" expanded="false" />
+                <element signature="e#25503#25595#0" expanded="false" />
+                <element signature="e#27547#28232#0" expanded="false" />
+                <element signature="e#27804#28208#0" expanded="false" />
+                <element signature="e#28236#28786#0" expanded="false" />
+                <element signature="e#28472#28747#0" expanded="false" />
+                <element signature="e#28498#28643#0" expanded="false" />
+                <element signature="e#28575#28635#0" expanded="false" />
+                <element signature="e#28711#28741#0" expanded="false" />
+                <element signature="e#28791#30624#0" expanded="false" />
+                <element signature="e#29049#30605#0" expanded="false" />
+                <element signature="e#29081#29253#0" expanded="false" />
+                <element signature="e#29274#29445#0" expanded="false" />
+                <element signature="e#30350#30471#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -189,117 +263,7 @@
         <entry file="file://$PROJECT_DIR$/src/test/scala/quantscale/analytic/SABRSuite.scala">
           <provider selected="true" editor-type-id="text-editor">
             <state line="1183" column="0" selection-start="53930" selection-end="57398" vertical-scroll-proportion="0.0">
-              <folding>
-                <element signature="e#772#2594#0" expanded="false" />
-                <element signature="e#2264#2590#0" expanded="false" />
-                <element signature="e#2597#3251#0" expanded="false" />
-                <element signature="e#2866#3247#0" expanded="false" />
-                <element signature="e#3255#3911#0" expanded="false" />
-                <element signature="e#3526#3907#0" expanded="false" />
-                <element signature="e#3915#4504#0" expanded="false" />
-                <element signature="e#4117#4500#0" expanded="false" />
-                <element signature="e#4508#5256#0" expanded="false" />
-                <element signature="e#5260#5657#0" expanded="false" />
-                <element signature="e#5661#6272#0" expanded="false" />
-                <element signature="e#6276#7353#0" expanded="false" />
-                <element signature="e#7357#8444#0" expanded="false" />
-                <element signature="e#8448#8967#0" expanded="false" />
-                <element signature="e#8971#10671#0" expanded="false" />
-                <element signature="e#9509#10667#0" expanded="false" />
-                <element signature="e#10675#17147#0" expanded="false" />
-                <element signature="e#11587#13457#0" expanded="false" />
-                <element signature="e#13620#17143#0" expanded="false" />
-                <element signature="e#17151#24778#0" expanded="false" />
-                <element signature="e#17774#17780#0" expanded="false" />
-                <element signature="e#18686#20812#0" expanded="false" />
-                <element signature="e#20989#24774#0" expanded="false" />
-                <element signature="e#24782#27192#0" expanded="false" />
-                <element signature="e#27196#27891#0" expanded="false" />
-                <element signature="e#27463#27867#0" expanded="false" />
-                <element signature="e#27895#28336#0" expanded="false" />
-                <element signature="e#28108#28304#0" expanded="false" />
-                <element signature="e#28244#28298#0" expanded="false" />
-                <element signature="e#28340#32645#0" expanded="false" />
-                <element signature="e#29239#32641#0" expanded="false" />
-                <element signature="e#29344#32635#0" expanded="false" />
-                <element signature="e#29406#32605#0" expanded="false" />
-                <element signature="e#32649#34230#0" expanded="false" />
-                <element signature="e#33562#34226#0" expanded="false" />
-                <element signature="e#33653#34220#0" expanded="false" />
-                <element signature="e#33691#34212#0" expanded="false" />
-                <element signature="e#33753#34182#0" expanded="false" />
-                <element signature="e#34234#34584#0" expanded="false" />
-                <element signature="e#34588#36338#0" expanded="false" />
-                <element signature="e#35502#36334#0" expanded="false" />
-                <element signature="e#35685#36328#0" expanded="false" />
-                <element signature="e#35725#36320#0" expanded="false" />
-                <element signature="e#35791#36286#0" expanded="false" />
-                <element signature="e#36342#37863#0" expanded="false" />
-                <element signature="e#37170#37859#0" expanded="false" />
-                <element signature="e#37267#37853#0" expanded="false" />
-                <element signature="e#37325#37845#0" expanded="false" />
-                <element signature="e#37365#37811#0" expanded="false" />
-                <element signature="e#37867#39664#0" expanded="false" />
-                <element signature="e#38281#38625#0" expanded="false" />
-                <element signature="e#38305#38383#0" expanded="false" />
-                <element signature="e#38709#39059#0" expanded="false" />
-                <element signature="e#38733#38816#0" expanded="false" />
-                <element signature="e#39198#39287#0" expanded="false" />
-                <element signature="e#39374#39463#0" expanded="false" />
-                <element signature="e#39668#41477#0" expanded="false" />
-                <element signature="e#40096#40439#0" expanded="false" />
-                <element signature="e#40120#40198#0" expanded="false" />
-                <element signature="e#40523#40872#0" expanded="false" />
-                <element signature="e#40547#40630#0" expanded="false" />
-                <element signature="e#41011#41100#0" expanded="false" />
-                <element signature="e#41187#41276#0" expanded="false" />
-                <element signature="e#41481#48893#0" expanded="false" />
-                <element signature="e#41802#41835#0" expanded="false" />
-                <element signature="e#42227#42274#0" expanded="false" />
-                <element signature="e#42504#48889#0" expanded="false" />
-                <element signature="e#42880#48869#0" expanded="false" />
-                <element signature="e#42942#48839#0" expanded="false" />
-                <element signature="e#43607#43737#0" expanded="false" />
-                <element signature="e#46434#46566#0" expanded="false" />
-                <element signature="e#48897#51652#0" expanded="false" />
-                <element signature="e#50095#50174#0" expanded="false" />
-                <element signature="e#50252#51647#0" expanded="false" />
-                <element signature="e#50479#50568#0" expanded="false" />
-                <element signature="e#51331#51641#0" expanded="false" />
-                <element signature="e#51656#53928#0" expanded="false" />
-                <element signature="e#52474#52578#0" expanded="false" />
-                <element signature="e#53430#53923#0" expanded="false" />
-                <element signature="e#53504#53856#0" expanded="false" />
-                <element signature="e#55360#55452#0" expanded="false" />
-                <element signature="e#55597#57394#0" expanded="false" />
-                <element signature="e#57305#57388#0" expanded="false" />
-                <element signature="e#57402#64528#0" expanded="false" />
-                <element signature="e#57905#57954#0" expanded="false" />
-                <element signature="e#58233#64524#0" expanded="false" />
-                <element signature="e#58530#64518#0" expanded="false" />
-                <element signature="e#58592#64488#0" expanded="false" />
-                <element signature="e#59257#59387#0" expanded="false" />
-                <element signature="e#62084#62216#0" expanded="false" />
-                <element signature="e#64532#66273#0" expanded="false" />
-                <element signature="e#64777#66254#0" expanded="false" />
-                <element signature="e#64809#64982#0" expanded="false" />
-                <element signature="e#65003#65175#0" expanded="false" />
-                <element signature="e#66278#66812#0" expanded="false" />
-                <element signature="e#66498#66773#0" expanded="false" />
-                <element signature="e#66524#66669#0" expanded="false" />
-                <element signature="e#66601#66661#0" expanded="false" />
-                <element signature="e#66737#66767#0" expanded="false" />
-                <element signature="e#66816#68613#0" expanded="false" />
-                <element signature="e#67535#68609#0" expanded="false" />
-                <element signature="e#67645#68603#0" expanded="false" />
-                <element signature="e#67685#68595#0" expanded="false" />
-                <element signature="e#67917#68560#0" expanded="false" />
-                <element signature="e#68617#70424#0" expanded="false" />
-                <element signature="e#69332#70420#0" expanded="false" />
-                <element signature="e#69442#70414#0" expanded="false" />
-                <element signature="e#69482#70406#0" expanded="false" />
-                <element signature="e#69709#70371#0" expanded="false" />
-              </folding>
+              <folding />
             </state>
           </provider>
         </entry>
@@ -342,19 +306,19 @@
       <list>
         <option value="$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganCNBDF3SABRDensitySolver.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganLawsonSwayneSABRDensitySolver.scala" />
-        <option value="$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganSABRDensitySolver.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganLawsonSwayneTransformedSABRDensitySolver.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganRichardsonEulerSABRTransformedDensitySolver.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganRichardsonEulerSABRDensitySolver.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/quantscale/analytic/CumulativeNormalDistribution.scala" />
         <option value="$PROJECT_DIR$/src/test/scala/quantscale/math/CumulativeNormalDistributionSuite.scala" />
         <option value="$PROJECT_DIR$/src/test/scala/quantscale/analytic/SABRSuite.scala" />
-        <option value="$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganCNBDF3SABRTransformedDensitySolver.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganLawsonSwayneSABRTransformedDensitySolver.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganLMG2SABRTransformedDensitySolver.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganLMG3SABRTransformedDensitySolver.scala" />
-        <option value="$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganSABRTransformedDensitySolver.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganTRBDF2SABRTransformedDensitySolver.scala" />
+        <option value="$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganSABRTransformedDensitySolver.scala" />
+        <option value="$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganSABRDensitySolver.scala" />
+        <option value="$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganCNBDF3SABRTransformedDensitySolver.scala" />
         <option value="$PROJECT_DIR$/src/test/scala/quantscale/analytic/TransformedSABRSuite.scala" />
       </list>
     </option>
@@ -405,6 +369,7 @@
       <sortByType />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -684,7 +649,6 @@
         </subPane>
       </pane>
       <pane id="PackagesPane" />
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -700,9 +664,9 @@
     <property name="GoToClass.toSaveIncludeLibraries" value="false" />
     <property name="MemberChooser.showClasses" value="true" />
     <property name="GoToClass.includeLibraries" value="false" />
-    <property name="dynamic.classpath" value="false" />
-    <property name="options.splitter.details.proportions" value="0.2" />
     <property name="options.searchVisible" value="true" />
+    <property name="options.splitter.details.proportions" value="0.2" />
+    <property name="dynamic.classpath" value="false" />
   </component>
   <component name="RecentsManager">
     <key name="CopyClassDialog.RECENTS_KEY">
@@ -802,6 +766,19 @@
       <option name="PORT" value="5005" />
       <method />
     </configuration>
+    <configuration default="true" type="Applet" factoryName="Applet">
+      <module name="" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="HTML_FILE_NAME" />
+      <option name="HTML_USED" value="false" />
+      <option name="WIDTH" value="400" />
+      <option name="HEIGHT" value="300" />
+      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
+      <option name="VM_PARAMETERS" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <method />
+    </configuration>
     <configuration default="true" type="TestNG" factoryName="TestNG">
       <module name="" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
@@ -827,19 +804,6 @@
       <envs />
       <properties />
       <listeners />
-      <method />
-    </configuration>
-    <configuration default="true" type="Applet" factoryName="Applet">
-      <module name="" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="HTML_FILE_NAME" />
-      <option name="HTML_USED" value="false" />
-      <option name="WIDTH" value="400" />
-      <option name="HEIGHT" value="300" />
-      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
-      <option name="VM_PARAMETERS" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
       <method />
     </configuration>
     <configuration default="true" type="Application" factoryName="Application">
@@ -963,7 +927,6 @@
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32941177" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="JetGradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3274648" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="SBT Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24352941" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.28" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -972,13 +935,14 @@
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32705882" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3293556" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24149108" sideWeight="0.56235296" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24149108" sideWeight="0.6035294" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3006483" sideWeight="0.3529412" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.64705884" sideWeight="0.49958158" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3006483" sideWeight="0.6035294" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.39647058" sideWeight="0.49958158" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3274648" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="combo" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
     </layout>
@@ -1048,11 +1012,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/test/scala/quantscale/math/CumulativeNormalDistributionSuite.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="219" column="5" selection-start="9123" selection-end="9123" vertical-scroll-proportion="0.020992367" />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/quantscale/analytic/BachelierVanillaEuropean.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state line="6" column="6" selection-start="101" selection-end="101" vertical-scroll-proportion="0.18145162" />
@@ -1078,154 +1037,9 @@
         <state line="6" column="6" selection-start="147" selection-end="147" vertical-scroll-proportion="0.1369863" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganCNBDF3SABRTransformedDensitySolver.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="27" column="0" selection-start="860" selection-end="860" vertical-scroll-proportion="0.52">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganSABRDensitySolver.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="327" column="6" selection-start="11024" selection-end="11024" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/test/scala/quantscale/analytic/SABRSuite.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state line="1183" column="0" selection-start="53930" selection-end="57398" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="e#772#2594#0" expanded="false" />
-            <element signature="e#2264#2590#0" expanded="false" />
-            <element signature="e#2597#3251#0" expanded="false" />
-            <element signature="e#2866#3247#0" expanded="false" />
-            <element signature="e#3255#3911#0" expanded="false" />
-            <element signature="e#3526#3907#0" expanded="false" />
-            <element signature="e#3915#4504#0" expanded="false" />
-            <element signature="e#4117#4500#0" expanded="false" />
-            <element signature="e#4508#5256#0" expanded="false" />
-            <element signature="e#5260#5657#0" expanded="false" />
-            <element signature="e#5661#6272#0" expanded="false" />
-            <element signature="e#6276#7353#0" expanded="false" />
-            <element signature="e#7357#8444#0" expanded="false" />
-            <element signature="e#8448#8967#0" expanded="false" />
-            <element signature="e#8971#10671#0" expanded="false" />
-            <element signature="e#9509#10667#0" expanded="false" />
-            <element signature="e#10675#17147#0" expanded="false" />
-            <element signature="e#11587#13457#0" expanded="false" />
-            <element signature="e#13620#17143#0" expanded="false" />
-            <element signature="e#17151#24778#0" expanded="false" />
-            <element signature="e#17774#17780#0" expanded="false" />
-            <element signature="e#18686#20812#0" expanded="false" />
-            <element signature="e#20989#24774#0" expanded="false" />
-            <element signature="e#24782#27192#0" expanded="false" />
-            <element signature="e#27196#27891#0" expanded="false" />
-            <element signature="e#27463#27867#0" expanded="false" />
-            <element signature="e#27895#28336#0" expanded="false" />
-            <element signature="e#28108#28304#0" expanded="false" />
-            <element signature="e#28244#28298#0" expanded="false" />
-            <element signature="e#28340#32645#0" expanded="false" />
-            <element signature="e#29239#32641#0" expanded="false" />
-            <element signature="e#29344#32635#0" expanded="false" />
-            <element signature="e#29406#32605#0" expanded="false" />
-            <element signature="e#32649#34230#0" expanded="false" />
-            <element signature="e#33562#34226#0" expanded="false" />
-            <element signature="e#33653#34220#0" expanded="false" />
-            <element signature="e#33691#34212#0" expanded="false" />
-            <element signature="e#33753#34182#0" expanded="false" />
-            <element signature="e#34234#34584#0" expanded="false" />
-            <element signature="e#34588#36338#0" expanded="false" />
-            <element signature="e#35502#36334#0" expanded="false" />
-            <element signature="e#35685#36328#0" expanded="false" />
-            <element signature="e#35725#36320#0" expanded="false" />
-            <element signature="e#35791#36286#0" expanded="false" />
-            <element signature="e#36342#37863#0" expanded="false" />
-            <element signature="e#37170#37859#0" expanded="false" />
-            <element signature="e#37267#37853#0" expanded="false" />
-            <element signature="e#37325#37845#0" expanded="false" />
-            <element signature="e#37365#37811#0" expanded="false" />
-            <element signature="e#37867#39664#0" expanded="false" />
-            <element signature="e#38281#38625#0" expanded="false" />
-            <element signature="e#38305#38383#0" expanded="false" />
-            <element signature="e#38709#39059#0" expanded="false" />
-            <element signature="e#38733#38816#0" expanded="false" />
-            <element signature="e#39198#39287#0" expanded="false" />
-            <element signature="e#39374#39463#0" expanded="false" />
-            <element signature="e#39668#41477#0" expanded="false" />
-            <element signature="e#40096#40439#0" expanded="false" />
-            <element signature="e#40120#40198#0" expanded="false" />
-            <element signature="e#40523#40872#0" expanded="false" />
-            <element signature="e#40547#40630#0" expanded="false" />
-            <element signature="e#41011#41100#0" expanded="false" />
-            <element signature="e#41187#41276#0" expanded="false" />
-            <element signature="e#41481#48893#0" expanded="false" />
-            <element signature="e#41802#41835#0" expanded="false" />
-            <element signature="e#42227#42274#0" expanded="false" />
-            <element signature="e#42504#48889#0" expanded="false" />
-            <element signature="e#42880#48869#0" expanded="false" />
-            <element signature="e#42942#48839#0" expanded="false" />
-            <element signature="e#43607#43737#0" expanded="false" />
-            <element signature="e#46434#46566#0" expanded="false" />
-            <element signature="e#48897#51652#0" expanded="false" />
-            <element signature="e#50095#50174#0" expanded="false" />
-            <element signature="e#50252#51647#0" expanded="false" />
-            <element signature="e#50479#50568#0" expanded="false" />
-            <element signature="e#51331#51641#0" expanded="false" />
-            <element signature="e#51656#53928#0" expanded="false" />
-            <element signature="e#52474#52578#0" expanded="false" />
-            <element signature="e#53430#53923#0" expanded="false" />
-            <element signature="e#53504#53856#0" expanded="false" />
-            <element signature="e#55360#55452#0" expanded="false" />
-            <element signature="e#55597#57394#0" expanded="false" />
-            <element signature="e#57305#57388#0" expanded="false" />
-            <element signature="e#57402#64528#0" expanded="false" />
-            <element signature="e#57905#57954#0" expanded="false" />
-            <element signature="e#58233#64524#0" expanded="false" />
-            <element signature="e#58530#64518#0" expanded="false" />
-            <element signature="e#58592#64488#0" expanded="false" />
-            <element signature="e#59257#59387#0" expanded="false" />
-            <element signature="e#62084#62216#0" expanded="false" />
-            <element signature="e#64532#66273#0" expanded="false" />
-            <element signature="e#64777#66254#0" expanded="false" />
-            <element signature="e#64809#64982#0" expanded="false" />
-            <element signature="e#65003#65175#0" expanded="false" />
-            <element signature="e#66278#66812#0" expanded="false" />
-            <element signature="e#66498#66773#0" expanded="false" />
-            <element signature="e#66524#66669#0" expanded="false" />
-            <element signature="e#66601#66661#0" expanded="false" />
-            <element signature="e#66737#66767#0" expanded="false" />
-            <element signature="e#66816#68613#0" expanded="false" />
-            <element signature="e#67535#68609#0" expanded="false" />
-            <element signature="e#67645#68603#0" expanded="false" />
-            <element signature="e#67685#68595#0" expanded="false" />
-            <element signature="e#67917#68560#0" expanded="false" />
-            <element signature="e#68617#70424#0" expanded="false" />
-            <element signature="e#69332#70420#0" expanded="false" />
-            <element signature="e#69442#70414#0" expanded="false" />
-            <element signature="e#69482#70406#0" expanded="false" />
-            <element signature="e#69709#70371#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganLawsonSwayneSABRTransformedDensitySolver.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="30" column="21" selection-start="888" selection-end="973" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganLMG2SABRTransformedDensitySolver.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="23" column="15" selection-start="738" selection-end="806" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganLMG3SABRTransformedDensitySolver.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="26" column="12" selection-start="808" selection-end="900" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
@@ -1237,25 +1051,134 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganSABRDensitySolver.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="331" column="0" selection-start="11262" selection-end="11262" vertical-scroll-proportion="0.6836983">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganLMG3SABRTransformedDensitySolver.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="26" column="12" selection-start="808" selection-end="900" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganLawsonSwayneSABRTransformedDensitySolver.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="30" column="21" selection-start="888" selection-end="973" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganCNBDF3SABRTransformedDensitySolver.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="25" column="0" selection-start="784" selection-end="886" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganSABRTransformedDensitySolver.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="91" column="0" selection-start="2387" selection-end="2519" vertical-scroll-proportion="0.0">
+        <state line="291" column="87" selection-start="9028" selection-end="9032" vertical-scroll-proportion="0.7777778">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganTRBDF2SABRTransformedDensitySolver.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="29" column="0" selection-start="951" selection-end="1053" vertical-scroll-proportion="0.0">
+        <state line="29" column="0" selection-start="951" selection-end="1053" vertical-scroll-proportion="0.03846154">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganLMG2SABRTransformedDensitySolver.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="23" column="15" selection-start="738" selection-end="806" vertical-scroll-proportion="0.3649635">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/scala/quantscale/fdm/sabr/HaganLMG2SABRDensitySolver.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="6" column="6" selection-start="147" selection-end="147" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/scala/quantscale/analytic/TransformedSABRSuite.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="661" column="41" selection-start="25722" selection-end="25722" vertical-scroll-proportion="0.27272728">
+        <state line="579" column="70" selection-start="22358" selection-end="22358" vertical-scroll-proportion="-0.15815085">
           <folding>
-            <element signature="e#25484#25576#0" expanded="false" />
+            <element signature="e#613#3312#0" expanded="false" />
+            <element signature="e#2199#2246#0" expanded="false" />
+            <element signature="e#2514#3308#0" expanded="false" />
+            <element signature="e#2544#3302#0" expanded="false" />
+            <element signature="e#2586#3293#0" expanded="false" />
+            <element signature="e#3329#3979#0" expanded="false" />
+            <element signature="e#4003#4814#0" expanded="false" />
+            <element signature="e#4834#5357#0" expanded="false" />
+            <element signature="e#5384#7264#0" expanded="false" />
+            <element signature="e#6934#7260#0" expanded="false" />
+            <element signature="e#7293#9548#0" expanded="false" />
+            <element signature="e#9587#11308#0" expanded="false" />
+            <element signature="e#10472#11304#0" expanded="false" />
+            <element signature="e#10655#11298#0" expanded="false" />
+            <element signature="e#10695#11290#0" expanded="false" />
+            <element signature="e#10761#11256#0" expanded="false" />
+            <element signature="e#11344#13071#0" expanded="false" />
+            <element signature="e#12235#13067#0" expanded="false" />
+            <element signature="e#12418#13061#0" expanded="false" />
+            <element signature="e#12458#13053#0" expanded="false" />
+            <element signature="e#12524#13019#0" expanded="false" />
+            <element signature="e#13075#13425#0" expanded="false" />
+            <element signature="e#13429#13881#0" expanded="false" />
+            <element signature="e#13653#13849#0" expanded="false" />
+            <element signature="e#13789#13843#0" expanded="false" />
+            <element signature="e#13915#15400#0" expanded="false" />
+            <element signature="e#14707#15396#0" expanded="false" />
+            <element signature="e#14804#15390#0" expanded="false" />
+            <element signature="e#14862#15382#0" expanded="false" />
+            <element signature="e#14902#15348#0" expanded="false" />
+            <element signature="e#15456#16958#0" expanded="false" />
+            <element signature="e#16265#16954#0" expanded="false" />
+            <element signature="e#16362#16948#0" expanded="false" />
+            <element signature="e#16420#16940#0" expanded="false" />
+            <element signature="e#16460#16906#0" expanded="false" />
+            <element signature="e#17000#18753#0" expanded="false" />
+            <element signature="e#17676#18749#0" expanded="false" />
+            <element signature="e#17786#18743#0" expanded="false" />
+            <element signature="e#17826#18735#0" expanded="false" />
+            <element signature="e#18058#18700#0" expanded="false" />
+            <element signature="e#18791#20559#0" expanded="false" />
+            <element signature="e#19467#20555#0" expanded="false" />
+            <element signature="e#19577#20549#0" expanded="false" />
+            <element signature="e#19617#20541#0" expanded="false" />
+            <element signature="e#19844#20506#0" expanded="false" />
+            <element signature="e#20598#22357#0" expanded="false" />
+            <element signature="e#21280#22353#0" expanded="false" />
+            <element signature="e#21390#22347#0" expanded="false" />
+            <element signature="e#21430#22339#0" expanded="false" />
+            <element signature="e#21662#22304#0" expanded="false" />
+            <element signature="e#22392#24166#0" expanded="false" />
+            <element signature="e#23074#24162#0" expanded="false" />
+            <element signature="e#23184#24156#0" expanded="false" />
+            <element signature="e#23224#24148#0" expanded="false" />
+            <element signature="e#23451#24113#0" expanded="false" />
+            <element signature="e#25503#25595#0" expanded="false" />
+            <element signature="e#27547#28232#0" expanded="false" />
+            <element signature="e#27804#28208#0" expanded="false" />
+            <element signature="e#28236#28786#0" expanded="false" />
+            <element signature="e#28472#28747#0" expanded="false" />
+            <element signature="e#28498#28643#0" expanded="false" />
+            <element signature="e#28575#28635#0" expanded="false" />
+            <element signature="e#28711#28741#0" expanded="false" />
+            <element signature="e#28791#30624#0" expanded="false" />
+            <element signature="e#29049#30605#0" expanded="false" />
+            <element signature="e#29081#29253#0" expanded="false" />
+            <element signature="e#29274#29445#0" expanded="false" />
+            <element signature="e#30350#30471#0" expanded="false" />
           </folding>
         </state>
       </provider>

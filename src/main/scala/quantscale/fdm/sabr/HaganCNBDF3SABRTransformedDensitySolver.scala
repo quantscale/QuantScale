@@ -23,9 +23,9 @@ class HaganCNBDF3SABRTransformedDensitySolver(spec: SABRModelSpec, forward: Doub
     val rhs = Array.ofDim[Double](size)
     var tIndex = 0
     while (tIndex < timeSteps) {
-                        if (tIndex < 4) {
-                    printTimeStep(t)
-                  }
+//                        if (tIndex < 4) {
+//                    printTimeStep(t)
+//                  }
 
       t -= dt
       Array.copy(Em_, 0, M0, 0, size)
