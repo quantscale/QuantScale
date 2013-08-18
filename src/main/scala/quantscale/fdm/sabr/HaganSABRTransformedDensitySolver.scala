@@ -89,9 +89,9 @@ class HaganSABRTransformedDensitySolver(spec: SABRModelSpec, forward: Double, T:
     var tIndex = 0
 
     while (tIndex < timeSteps) {
-                              if (tIndex < 4) {
-                                printTimeStep(t)
-                              }
+//                              if (tIndex < 4) {
+//                                printTimeStep(t)
+//                              }
       if (useRannacher && indexRannacher < 2) {
         t -= dt / 2
         advanceEm(dt / 2, Em_)

@@ -3,7 +3,7 @@ package quantscale.fdm.sabr
 import quantscale.analytic.SABRModelSpec
 import quantscale.fdm.{TridiagonalMatrix}
 
-class HaganCNBDF3SABRTransformedDensitySolver(spec: SABRModelSpec, forward: Double, T: Double, size: Int = 100, timeSteps: Int = 10, nDeviations: Double = 3.0)
+class HaganBathe3SubstepsSABRTransformedDensitySolver(spec: SABRModelSpec, forward: Double, T: Double, size: Int = 100, timeSteps: Int = 10, nDeviations: Double = 3.0)
   extends HaganSABRTransformedDensitySolver(spec, forward, T, size, timeSteps, nDeviations) {
 
 
@@ -47,7 +47,7 @@ class HaganCNBDF3SABRTransformedDensitySolver(spec: SABRModelSpec, forward: Doub
       val QR2 = PR_
       PL_ += 0.5 * dt3 * Cm_(1) / (Fm_(1) - Fm_(0)) * (Em_(1) * Q2(1) + M0(1) * P1_(1))
       PR_ += 0.5 * dt3 * Cm_(size - 2) / (Fm_(size - 1) - Fm_(size - 2)) * (Em_(size - 2) * Q2(size - 2) + M0(size - 2) * P1_(size - 2))
-
+      //printSumPF("TR/Bathe3", t, Q2, PL_, PR_)
       var j = size - 2
       while (j >= 1) {
         rhs(j) = (18 * Q2(j) - 9 * P1_(j) + 2 * P0_(j)) / 11
@@ -60,7 +60,7 @@ class HaganCNBDF3SABRTransformedDensitySolver(spec: SABRModelSpec, forward: Doub
       PL_ = (18 * PL_ - 9 * QL2 + 2 * QL1) / 11 + 6 * dt3 / 11 * computedPLdt(Em_, P1_)
       PR_ = (18 * PR_ - 9 * QR2 + 2 * QR1) / 11 + 6 * dt3 / 11 * computedPRdt(Em_, P1_)
 
-      //printSumQF("TRBDF3", t, Q1, QL_, QR_)
+      //printSumPF("Bathe3", t, P1_, PL_, PR_)
       val Qtmp = P0_
       P0_ = P1_
       P1_ = Qtmp

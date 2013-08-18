@@ -171,7 +171,7 @@ class TransformedSABRSuite extends FunSuite {
     pdeMap += "TRBDF2" -> new HaganTRBDF2SABRTransformedDensitySolver(spec, forward, tte, xSteps, tSteps, nDeviation)
     pdeMap += "RE" -> new HaganRichardsonEulerSABRTransformedDensitySolver(spec, forward, tte, xSteps, tSteps, nDeviation)
     // pdeMap += "ADE" -> new HaganADESABRDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
-    pdeMap += "TRBDF3" -> new HaganCNBDF3SABRTransformedDensitySolver(spec, forward, tte, xSteps, tSteps, nDeviation)
+    pdeMap += "TRBDF3" -> new HaganBathe3SubstepsSABRTransformedDensitySolver(spec, forward, tte, xSteps, tSteps, nDeviation)
 
     for ((name, pde) <- pdeMap) {
       pde.solve()
@@ -192,7 +192,7 @@ class TransformedSABRSuite extends FunSuite {
     val tte = 1.0;
     val df = 1.0
     val xSteps = 500
-    val tSteps = 320
+    val tSteps = 5
     val nDeviation = 4.0
     val spec = new SABRModelSpec(alpha, beta, nu, rho)
     var pde = new HaganSABRTransformedDensitySolver(spec, forward, tte, xSteps, tSteps, nDeviation)
@@ -210,7 +210,8 @@ class TransformedSABRSuite extends FunSuite {
     pdeMap += "TRBDF2" -> new HaganTRBDF2SABRTransformedDensitySolver(spec, forward, tte, xSteps, tSteps, nDeviation)
     pdeMap += "RE" -> new HaganRichardsonEulerSABRTransformedDensitySolver(spec, forward, tte, xSteps, tSteps, nDeviation)
     // pdeMap += "ADE" -> new HaganADESABRDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
-    pdeMap += "TRBDF3" -> new HaganCNBDF3SABRTransformedDensitySolver(spec, forward, tte, xSteps, tSteps, nDeviation)
+    pdeMap += "Bathe3" -> new HaganBathe3SubstepsSABRTransformedDensitySolver(spec, forward, tte, xSteps, tSteps, nDeviation)
+    pdeMap += "TRBDF3" -> new HaganTRBDF3SABRTransformedDensitySolver(spec, forward, tte, xSteps, tSteps, nDeviation)
     val h = pde.h
     val dt = pde.dt
     println(f"h=$h%2.12f")
@@ -256,7 +257,7 @@ class TransformedSABRSuite extends FunSuite {
     val Qspline = CubicSpline.makeCubicSpline(refPDE.Fm, refPDE.P)
 
     var solver = new Li2011SORDRBlackVolatilitySolver(1e-12)
-    val schemes = Array("CN", "RAN", "LMG2", "LMG3", "LS", "TRBDF2", "TRBDF3", "RE")
+    val schemes = Array("CN", "RAN", "LMG2", "LMG3", "LS", "TRBDF2", "Bathe3","TRBDF3", "RE")
     val spaceSteps = Array(500) // Array(80, 160, 320, 640, 1280)
     val timeSteps = Array(1,2,3,4, 5,6,7,8,9, 10, 20, 40, 80, 160, 320, 640, 1280)
     for (l <- 0 to 9) {
@@ -411,7 +412,7 @@ class TransformedSABRSuite extends FunSuite {
 
     val spaceSteps = Array(500) // Array(80, 160, 320, 640, 1280)
     val timeSteps = Array(1, 2, 3, 4, 5, 6,7,8,9, 10, 20, 40, 80, 160, 320, 640, 1280)
-    val schemes = Array("CN", "RAN", "LMG2", "LMG3", "LS", "TRBDF2", "TRBDF3", "RE")
+    val schemes = Array("CN", "RAN", "LMG2", "LMG3", "LS", "TRBDF2", "Bathe3", "TRBDF3", "RE")
     for (l <- 0 until 9) {
       println("SpaceSteps TimeSteps Scheme MaxError Time")
       for (spaceStep <- spaceSteps) {
@@ -745,7 +746,8 @@ class TransformedSABRSuite extends FunSuite {
       case "LS" => pde = new HaganLawsonSwayneSABRTransformedDensitySolver(spec, forward, tte, spaceStep, timeStep, nDeviation)
       case "TRBDF2" => pde = new HaganTRBDF2SABRTransformedDensitySolver(spec, forward, tte, spaceStep, timeStep, nDeviation)
       //case "CNBDF2" => pde = new HaganCNBDF2SABRTransformedDensitySolver(spec, forward, tte, spaceStep, timeStep, FmaxTruncation)
-      case "TRBDF3" | "CNBDF3" => pde = new HaganCNBDF3SABRTransformedDensitySolver(spec, forward, tte, spaceStep, timeStep, nDeviation)
+      case "Bathe3" => pde = new HaganBathe3SubstepsSABRTransformedDensitySolver(spec, forward, tte, spaceStep, timeStep, nDeviation)
+      case "TRBDF3" | "CNBDF3" => pde = new HaganTRBDF3SABRTransformedDensitySolver(spec, forward, tte, spaceStep, timeStep, nDeviation)
       case "RE" => pde = new HaganRichardsonEulerSABRTransformedDensitySolver(spec, forward, tte, spaceStep, timeStep, nDeviation)
       //case "BDF2" => pde = new HaganBDF2SABRTransformedDensitySolver(spec, forward, tte, spaceStep, timeStep, FmaxTruncation)
       //case "BDF3" => pde = new HaganBDF3SABRTransformedDensitySolver(spec, forward, tte, spaceStep, timeStep, FmaxTruncation)
