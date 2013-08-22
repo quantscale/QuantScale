@@ -104,7 +104,7 @@ class HaganBDF3SABRDensitySolver(spec: SABRModelSpec, forward: Double, T: Double
       tIndex += 1
 
     }
-    Q0_ = Q1
+    Q0_ = Q2
   }
 
   private def computeSystem(tri1: TridiagonalMatrix, dt: Double) {

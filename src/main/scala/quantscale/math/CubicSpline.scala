@@ -1,12 +1,17 @@
 package quantscale.math
+
 import quantscale.fdm.Epsilon
 import quantscale.fdm.TridiagonalMatrix
 import java.util.Arrays
 
-abstract class SplineBoundary
+sealed trait SplineBoundary
+
 case class NotAKnot extends SplineBoundary
+
 case class FirstDerivative(val value: Double) extends SplineBoundary
+
 case class SecondDerivative(val value: Double) extends SplineBoundary
+
 class Natural extends SecondDerivative(0.0)
 
 trait DerivativeFilter {
@@ -38,6 +43,7 @@ object MonotoneHyman83DerivativeFilter extends DerivativeFilter {
     else math.max(math.min(0, yPrime(n)), -3 * math.abs(x(n - 1)));
   }
 }
+
 /**
  * monotonic local interpolation scheme based on piecewise cubic
  * polynomials. This follows closely M. Steffen
@@ -336,7 +342,7 @@ object CubicSpline {
   }
 
   def makeBesselSpline(
-    x: Array[Double], y: Array[Double]): CubicPP = {
+                        x: Array[Double], y: Array[Double]): CubicPP = {
     val b = new Array[Double](x.length)
     computeParabolicFirstDerivative(x, y, b)
     return makeHermiteSpline(x, y, b)
@@ -347,17 +353,17 @@ object CubicSpline {
    * c and d and fill output.
    *
    * @param a
-   *            , lower diagonal defined from 1 to n-1, a[0] is ignored
+   * , lower diagonal defined from 1 to n-1, a[0] is ignored
    * @param b
-   *            , middle diagonal defined from 0 to n-1
+   * , middle diagonal defined from 0 to n-1
    * @param c
-   *            , upper diagonal defined from 0 to n-2, c[n-2] is ignored
+   * , upper diagonal defined from 0 to n-2, c[n-2] is ignored
    * @param d
-   *            , right hand side
+   * , right hand side
    * @param output
-   *            , solution of the tridiagonal system
+   * , solution of the tridiagonal system
    * @param n
-   *            , size on which to solve.
+   * , size on which to solve.
    */
   def solveTridiagonal(a: Array[Double], b: Array[Double], c: Array[Double], d: Array[Double],
                        output: Array[Double], n: Int) {
@@ -387,21 +393,24 @@ object CubicSpline {
  */
 class CubicPP(
 
-  var a: Array[Double],
-  /**
- * array of size n+1
- */
-  var b: Array[Double],
-  /**
- * array of size n+1
- */
-  var c: Array[Double],
-  /**
- * array of size n+1
- */
-  var d: Array[Double],
+               var a: Array[Double],
 
-  var x: Array[Double]) {
+               /**
+                * array of size n+1
+                */
+               var b: Array[Double],
+
+               /**
+                * array of size n+1
+                */
+               var c: Array[Double],
+
+               /**
+                * array of size n+1
+                */
+               var d: Array[Double],
+
+               var x: Array[Double]) {
 
   def value(z: Double): Double = {
     if (z < x(0)) {

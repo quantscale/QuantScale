@@ -4,17 +4,21 @@ import scala.collection.mutable.ArrayBuffer
 import scala.util.Sorting
 
 import quantscale.fdm.Epsilon
+import scala.reflect.ClassTag
 
 abstract class Mesh1D {
   def x: Array[Double]
+
   def size: Int
 }
+
 //    points.sortWith((a,b) => a.compare(b)>0)
 
 object Point {
-  def sortAndRemoveIdenticalPoints[T <: Point: ClassManifest](points: Array[T]): Array[T] = {
-    Sorting.quickSort(points.asInstanceOf[Array[Point]])
+
+  def sortAndRemoveIdenticalPoints[T <: Point : ClassTag](points: Array[T]): Array[T] = {
     if (points.length > 0) {
+      Sorting.quickSort(points)(new PointOrdering[T]())
       val l = new ArrayBuffer[T](points.length)
       var previous = points(0)
       l += points(0)
@@ -27,6 +31,14 @@ object Point {
       return l.toArray
     }
     return points
+  }
+
+
+}
+
+class PointOrdering[T <: Point] extends Ordering[T] {
+  def compare(p1: T, p2: T): Int = {
+    return math.signum(p1.value - p2.value).toInt
   }
 }
 

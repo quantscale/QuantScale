@@ -73,7 +73,7 @@ class HaganBDF2SABRDensitySolver(spec: SABRModelSpec, forward: Double, T: Double
       //      }
       //      println("t=" + t + " BDF2 Q=" + sumQ + " F=" + sumF + " Fj0=" + F(j0))
     }
-    Q0_ = Q1
+    Q0_ = Q1Half
   }
 
   private def computeSystem(tri1: TridiagonalMatrix, dt: Double) {

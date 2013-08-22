@@ -10,6 +10,16 @@ import scala.Array
  * TODO: rename Q in P, and the Q = P*h/(Fm+1-Fm)
  */
 
+abstract class Smoothing {}
+
+case class RannacherSmoothing extends Smoothing {}
+
+case class TRBDF2BDF3Smoothing extends Smoothing {}
+
+case class LMG3Smoothing extends Smoothing {}
+
+case class BDF2Smoothing extends Smoothing {}
+
 class HaganSABRTransformedDensitySolver(spec: SABRModelSpec, forward: Double, T: Double, size: Int = 1000, timeSteps: Int = 1000 / 5, nDeviations: Double = 3.0) extends SABRDensitySolver {
   private[sabr] var P0_, P1_ : Array[Double] = null
   private[sabr] var Fmin = spec.b
@@ -25,19 +35,25 @@ class HaganSABRTransformedDensitySolver(spec: SABRModelSpec, forward: Double, T:
   private[sabr] var solver = new ThomasTridiagonalSolver()
   solver.init(size)
 
-  var useRannacher: Boolean = false
-  var useApproxBoundary: Boolean = false
+  var smoothing: Smoothing = null
   private val forwardonebeta = math.pow(forward + spec.b, 1 - spec.beta)
 
   initGrid()
 
-  def name = if (useRannacher) "RAN" else "CN"
+  def name: String = {
+    smoothing match {
+      case RannacherSmoothing() => return "RAN"
+      case TRBDF2BDF3Smoothing() => return "CN-SBDF"
+      case LMG3Smoothing() => "LEF"
+      case _ => return "CN"
+    }
+  }
 
   def h: Double = h_
 
   def P: Array[Double] = P0_
 
-  def Q(i: Integer) = P0_(i)/(Fm_(i+1)-Fm_(i))*h
+  def Q(i: Integer) = P0_(i) / (Fm_(i + 1) - Fm_(i)) * h
 
   def PL = PL_
 
@@ -55,8 +71,8 @@ class HaganSABRTransformedDensitySolver(spec: SABRModelSpec, forward: Double, T:
 
   def printTimeStep(t: Double) {
     var str = ""
-    for (i <- 1 until P.length-1) {
-      str += t + " " + Fm(i) + " " + P(i)  + " "+ Em_(i) + "\n"
+    for (i <- 1 until P.length - 1) {
+      str += t + " " + Fm(i) + " " + P(i) + " " + Em_(i) + "\n"
     }
     println(str)
   }
@@ -74,11 +90,12 @@ class HaganSABRTransformedDensitySolver(spec: SABRModelSpec, forward: Double, T:
     tri1 = new TridiagonalMatrix(size)
     tri0 = new TridiagonalMatrix(size)
     val M0 = Array.ofDim[Double](size)
-    if (useRannacher) {
-      buildEmCache(dt / 2, dt)
-    } else {
-      buildEmCache(dt, 0)
+    smoothing match {
+      case RannacherSmoothing() | BDF2Smoothing() => buildEmCache(dt / 2, dt)
+      case TRBDF2BDF3Smoothing() | LMG3Smoothing() => buildEmCache(dt / 3, dt)
+      case _ => buildEmCache(dt, 0)
     }
+
     P0_ = computeP()
     P1_ = Array.ofDim(size)
     PL_ = 0.0
@@ -89,10 +106,11 @@ class HaganSABRTransformedDensitySolver(spec: SABRModelSpec, forward: Double, T:
     var tIndex = 0
 
     while (tIndex < timeSteps) {
-//                              if (tIndex < 4) {
-//                                printTimeStep(t)
-//                              }
-      if (useRannacher && indexRannacher < 2) {
+      //                              if (tIndex < 4) {
+      //                                printTimeStep(t)
+      //                              }
+
+      if (smoothing.isInstanceOf[RannacherSmoothing] && indexRannacher < 2) {
         t -= dt / 2
         advanceEm(dt / 2, Em_)
         computeSystem(dt, Em_, null, tri1, tri0) //will use dt/2 because of Crank
@@ -112,6 +130,137 @@ class HaganSABRTransformedDensitySolver(spec: SABRModelSpec, forward: Double, T:
         solver.solve(tri1, P0_, P1_)
         PL_ += dt / 2 * computedPLdt(Em_, P1_)
         PR_ += dt / 2 * computedPRdt(Em_, P1_)
+        indexRannacher += 1
+      } else if (smoothing.isInstanceOf[BDF2Smoothing] && indexRannacher > 2) {
+        t -= dt / 2
+        advanceEm(dt / 2, Em_)
+        computeSystem(dt, Em_, null, tri1, tri0) //will use dt/2 because of Crank
+        P0_(0) = 0
+        P0_(size - 1) = 0
+        solver.solve(tri1, P0_, P1_)
+        val PL1 = PL_
+        val PR1 = PR_
+        PL_ += dt / 2 * Cm_(1) / (Fm_(1) - Fm_(0)) * Em_(1) * P1_(1)
+        PR_ += dt / 2 * Cm_(size - 2) / (Fm_(size - 1) - Fm_(size - 2)) * Em_(size - 2) * P1_(size - 2)
+        val Qtmp = P0_
+        P0_ = P1_
+        P1_ = Qtmp
+        t -= dt / 2
+        advanceEm(dt / 2, Em_)
+        var j = size - 2
+        while (j >= 1) {
+          rhs(j) = (4 * P1_(j) - P0_(j)) / 3.0
+          j -= 1
+        }
+
+        computeSystem(dt / 3.0, Em_, tri1)
+        solver.solve(tri1, rhs, P1_)
+        PL_ = (4 * PL_ - PL1) / 3.0 + 1.0 / 3.0 * dt * computedPLdt(Em_, P1_)
+        PR_ = (4 * PR_ - PR1) / 3.0 + 1.0 / 3.0 * dt * computedPRdt(Em_, P1_)
+
+        indexRannacher += 1
+
+      } else if (smoothing.isInstanceOf[LMG3Smoothing] && indexRannacher < 2) {
+        val Q1ThirdTmp = Array.ofDim[Double](size)
+        val Q1Third = Array.ofDim[Double](size)
+        val Q1Half = Array.ofDim[Double](size)
+        t -= dt / 3
+
+        advanceEm(dt / 3, Em_)
+        computeSystem(dt / 3, Em_, tri1)
+        P0_(0) = 0
+        P0_(size - 1) = 0
+        solver.solve(tri1, P0_, Q1ThirdTmp)
+        var QL_ThirdPart = PL_ + dt / 3 * computedPLdt(Em_, Q1ThirdTmp)
+        var QR_ThirdPart = PR_ + dt / 3 * computedPRdt(Em_, Q1ThirdTmp)
+        var QL_HalfPart = QL_ThirdPart
+        var QR_HalfPart = QR_ThirdPart
+        val Q0_Init = P0_
+        P0_ = Q1ThirdTmp
+
+        t -= dt / 3
+        advanceEm(dt / 3, Em_)
+        computeSystem(dt / 3, Em_, tri1)
+        P0_(0) = 0
+        P0_(size - 1) = 0
+        solver.solve(tri1, P0_, Q1Third)
+        QL_ThirdPart += dt / 3 * computedPLdt(Em_, Q1Third)
+        QR_ThirdPart += dt / 3 * computedPRdt(Em_, Q1Third)
+        P0_ = Q1Third
+
+        t -= dt / 3
+        advanceEm(dt / 3, Em_)
+        computeSystem(dt / 3, Em_, tri1)
+        P0_(0) = 0
+        P0_(size - 1) = 0
+        solver.solve(tri1, P0_, Q1Third)
+        QL_ThirdPart += dt / 3 * computedPLdt(Em_, Q1Third)
+        QR_ThirdPart += dt / 3 * computedPRdt(Em_, Q1Third)
+
+        P0_ = Q1ThirdTmp
+        computeSystem(2 * dt / 3, Em_, tri1)
+        P0_(0) = 0
+        P0_(size - 1) = 0
+        solver.solve(tri1, P0_, Q1Half)
+        QL_HalfPart += 2 * dt / 3 * computedPLdt(Em_, Q1Half)
+        QR_HalfPart += 2 * dt / 3 * computedPRdt(Em_, Q1Half)
+
+        P0_ = Q0_Init
+        computeSystem(dt, Em_, tri1)
+        P0_(0) = 0
+        P0_(size - 1) = 0
+        solver.solve(tri1, P0_, P1_)
+
+        PL_ += 4.5 * QL_ThirdPart - 4.5 * QL_HalfPart + dt * computedPLdt(Em_, P1_)
+        PR_ += 4.5 * QR_ThirdPart - 4.5 * QR_HalfPart + dt * computedPRdt(Em_, P1_)
+
+        var i = 0
+        while (i < size) {
+          P1_(i) = 4.5 * Q1Third(i) - 4.5 * Q1Half(i) + P1_(i)
+          i += 1
+        }
+        indexRannacher += 1
+      } else if (smoothing.isInstanceOf[TRBDF2BDF3Smoothing] && indexRannacher < 2) {
+        val dt3 = dt / 3.0
+        val Q2 = Array.ofDim[Double](size)
+        t -= dt
+        Array.copy(Em_, 0, M0, 0, size)
+        advanceEm(dt3, Em_)
+        computeSystem(dt3, Em_, M0, tri1, tri0)
+        tri0.multiply(P0_, rhs)
+        solver.solve(tri1, rhs, P1_)
+        val QL1 = PL_
+        val QR1 = PR_
+        PL_ += 0.5 * dt3 * Cm_(1) / (Fm_(1) - Fm_(0)) * (Em_(1) * P1_(1) + M0(1) * P0_(1))
+        PR_ += 0.5 * dt3 * Cm_(size - 2) / (Fm_(size - 1) - Fm_(size - 2)) * (Em_(size - 2) * P1_(size - 2) + M0(size - 2) * P0_(size - 2))
+        //printSumPF("TR/3", t, P1_, PL_, PR_)
+
+        var j = size - 2
+        while (j >= 1) {
+          rhs(j) = (4 * P1_(j) - P0_(j)) / 3.0
+          j -= 1
+        }
+        advanceEm(dt3, Em_)
+        computeSystem(dt3 / 3.0 * 2, Em_, tri1)
+        solver.solve(tri1, rhs, Q2)
+        val QL2 = PL_
+        val QR2 = PR_
+        PL_ = (4 * PL_ - QL1) / 3.0 + 2.0 / 3.0 * dt3 * computedPLdt(Em_, Q2)
+        PR_ = (4 * PR_ - QR1) / 3.0 + 2.0 / 3.0 * dt3 * computedPRdt(Em_, Q2)
+
+        //printSumPF("TRBDF2/3", t, Q2, PL_, PR_)
+
+        j = size - 2
+        while (j >= 1) {
+          rhs(j) = (18 * Q2(j) - 9 * P1_(j) + 2 * P0_(j)) / 11
+          j -= 1
+        }
+        advanceEm(dt3, Em_)
+        computeSystem(dt3 * 6.0 / 11, Em_, tri1)
+        solver.solve(tri1, rhs, P1_)
+
+        PL_ = (18 * PL_ - 9 * QL2 + 2 * QL1) / 11 + 6 * dt3 / 11 * computedPLdt(Em_, P1_)
+        PR_ = (18 * PR_ - 9 * QR2 + 2 * QR1) / 11 + 6 * dt3 / 11 * computedPRdt(Em_, P1_)
         indexRannacher += 1
       } else {
         t -= dt
@@ -255,8 +404,17 @@ class HaganSABRTransformedDensitySolver(spec: SABRModelSpec, forward: Double, T:
   }
 
 
-  private[sabr] def buildEmCache(dt1: Double, dt2: Double) {
+  private[sabr] def buildEm() {
     Em_ = Array.ofDim[Double](size)
+    var j = size - 1
+    while (j >= 0) {
+      Em_(j) = 1.0
+      j -= 1
+    }
+  }
+
+  private[sabr] def buildEmCache(dt1: Double, dt2: Double) {
+    buildEm()
     Em1Cache = Array.ofDim[Double](size)
     if (dt2 != 0) Em2Cache = Array.ofDim[Double](size)
     dt1cache = dt1
@@ -266,11 +424,9 @@ class HaganSABRTransformedDensitySolver(spec: SABRModelSpec, forward: Double, T:
     while (j > 0) {
       Em1Cache(j) = math.exp(efactor * Gammam_(j) * dt1)
       if (dt2 != 0) Em2Cache(j) = math.exp(efactor * Gammam_(j) * dt2)
-      Em_(j) = 1.0
       j -= 1
     }
-    Em_(0) = Em_(1)
-    Em_(size - 1) = Em_(size - 2)
+
     Em1Cache(0) = Em1Cache(1)
     Em1Cache(size - 1) = Em1Cache(size - 2)
     if (dt2 != 0) {
@@ -290,8 +446,8 @@ class HaganSABRTransformedDensitySolver(spec: SABRModelSpec, forward: Double, T:
 
   def computeCourantNumber(): Double = {
     val cfl = Cm_(j0) * (1 / (Fm_(j0 + 1) - Fm_(j0)) + 1 / (Fm_(j0) - Fm_(j0 - 1))) * dt / (2 * h)
-    val cfl2 = math.pow(forward,spec.beta)* dt_ / (h_ * h_)
-    println(cfl+" "+cfl2+" "+math.abs(cfl-cfl2))
+    val cfl2 = math.pow(forward, spec.beta) * dt_ / (h_ * h_)
+    println(cfl + " " + cfl2 + " " + math.abs(cfl - cfl2))
     return cfl
   }
 

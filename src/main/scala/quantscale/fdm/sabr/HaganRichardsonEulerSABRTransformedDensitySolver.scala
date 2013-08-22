@@ -8,12 +8,15 @@ class HaganRichardsonEulerSABRTransformedDensitySolver(spec: SABRModelSpec, forw
   extends HaganSABRTransformedDensitySolver(spec, forward, T, size, timeSteps, nDeviations) {
 
   override def solve() {
+    buildEmCache(dt_, dt_ / 2)
+    val EmInit = Em_.clone()
     solve(1)
     val Q0_full = Array.ofDim[Double](size)
     Array.copy(P0_, 0, Q0_full, 0, size) // a new array will be create later
     val QL_full = PL_
     val QR_full = PR_
     dt_ = dt_ / 2
+    Array.copy(EmInit, 0, Em_, 0, size)
     solve(2)
     var i = 0
     while (i < size) {
@@ -27,7 +30,7 @@ class HaganRichardsonEulerSABRTransformedDensitySolver(spec: SABRModelSpec, forw
 
   def solve(divisor: Int) {
     tri1 = new TridiagonalMatrix(size)
-    buildEmCache(dt_, 0)
+
 
     P0_ = computeP()
     P1_ = Array.ofDim(size)

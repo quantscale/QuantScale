@@ -15,11 +15,12 @@ import quantscale.vol.Li2011SORDRBlackVolatilitySolver
 import quantscale.vol.Li2011SORTSBlackVolatilitySolver
 import org.scalatest.junit.{JUnitSuite, JUnitRunner}
 import quantscale.fdm.Epsilon
-import org.junit.Test
+import _root_.org.junit.Test
+import org.scalatest.{FunSuite, Suite}
 
 @RunWith(classOf[JUnitRunner])
-class SABRSuite extends JUnitSuite {
-  @Test def testPutCallParity() {
+class SABRSuite extends FunSuite {
+  test("PutCallParity") {
     val alpha = 0.35;
     val nu = 1.0;
     val beta = 0.25;
@@ -39,7 +40,6 @@ class SABRSuite extends JUnitSuite {
     pde.useRannacher = true
     pdeMap += "RAN" -> pde
 
-
     pdeMap += "LMG2" -> new HaganLMG2SABRDensitySolver(spec, forward, tte, xSteps, tSteps, nDeviation)
     pdeMap += "LMG3" -> new HaganLMG3SABRDensitySolver(spec, forward, tte, xSteps, tSteps, nDeviation)
     pdeMap += "LS" -> new HaganLawsonSwayneSABRDensitySolver(spec, forward, tte, xSteps, tSteps, nDeviation)
@@ -47,17 +47,20 @@ class SABRSuite extends JUnitSuite {
     pdeMap += "RE" -> new HaganRichardsonEulerSABRDensitySolver(spec, forward, tte, xSteps, tSteps, nDeviation)
     // pdeMap += "ADE" -> new HaganADESABRDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
     pdeMap += "TRBDF3" -> new HaganCNBDF3SABRDensitySolver(spec, forward, tte, xSteps, tSteps, nDeviation)
+    pdeMap += "BDF2" -> new HaganBDF2SABRDensitySolver(spec, forward, tte, xSteps, tSteps, nDeviation)
+    pdeMap += "BDF3" -> new HaganBDF3SABRDensitySolver(spec, forward, tte, xSteps, tSteps, nDeviation)
 
     for ((name, pde) <- pdeMap) {
       pde.solve()
-      val pricePut = pde.price(false,forward)
+      val pricePut = pde.price(false, forward)
       val priceCall = pde.price(true, forward)
-      println(name+" "+pricePut+" "+priceCall)
-      assert(pricePut-priceCall < 1e-8, "put="+pricePut+" call="+priceCall)
+      println(name + " " + pricePut + " " + priceCall)
+      assert(pricePut - priceCall < 1e-8, "put=" + pricePut + " call=" + priceCall)
 
       // println(f"$name & $h%2.12f & $Qforward%2.12f & $QL%2.12f & $QR%2.12f\\\\")
     }
   }
+
   @Test def testLiSorDRIV {
     val forward = 100.0
     val strikes = Array(0.2 * forward, 0.5 * forward, 0.9 * forward, 1.0 * forward, 1.1 * forward, 1.5 * forward)
@@ -221,7 +224,7 @@ class SABRSuite extends JUnitSuite {
     assert(math.abs(haganVol - ahVol) < 3e-4)
   }
 
-  @Test def  testAndreasenHugePrice() {
+  @Test def testAndreasenHugePrice() {
     val alpha = 0.0758194;
     val nu = 0.1;
     val beta = 0.5;
@@ -537,8 +540,8 @@ class SABRSuite extends JUnitSuite {
     val pde =
     //      new HaganTruncatedSABRDensitySolver(spec, forward, tte, 10000, 1000)
       new HaganLMG3SABRDensitySolver(spec, forward, tte, 10000, 10, 1000.0)
-    val pdeTransformed = new HaganSABRTransformedDensitySolver(spec,forward,tte,1000,100,3)
-    pdeTransformed.useRannacher = true
+    val pdeTransformed = new HaganSABRTransformedDensitySolver(spec, forward, tte, 1000, 100, 3)
+    pdeTransformed.smoothing = new RannacherSmoothing()
     val volHagan = 100 * SABRVanilla.impliedVolatilityHagan(spec, forward, K, tte)
     val volAHShort = 100 * SABRVanilla.impliedVolatilityAndreasenHuge(spec, forward, K, tte)
     val priceAH = splinePut.value(K)
@@ -596,7 +599,7 @@ class SABRSuite extends JUnitSuite {
     return (maxError, Fmax)
   }
 
-  @Test def  testPDEDensityAccuracyAH() {
+  @Test def testPDEDensityAccuracyAH() {
     val alpha = 0.0873;
     val nu = 0.47;
     val beta = 0.7;
@@ -719,23 +722,23 @@ class SABRSuite extends JUnitSuite {
     val spaceSteps = Array(500) // Array(80, 160, 320, 640, 1280)
     val timeSteps = Array(2, 5, 10, 20, 40, 80, 160, 320, 640, 1280)
 
-    val schemes = Array("CN","RAN","LMG2","LMG3","LS","TRBDF2","TRBDF3")
+    val schemes = Array("CN", "RAN", "LMG2", "LMG3", "LS", "TRBDF2", "TRBDF3")
     for (l <- 0 to 7) {
       println("SpaceSteps TimeSteps Scheme MaxError Time")
       for (scheme <- schemes) {
-      for (spaceStep <- spaceSteps) {
-        var buffer = ""
-        for (timeStep <- timeSteps) {
-          var startTime = System.nanoTime()
-          val cn = createHaganSABRSolver(scheme,spec, forward, tte, spaceStep, timeStep, FmaxTruncation)
-          cn.solve()
-          var endTime = System.nanoTime()
-          var elapsed = (endTime - startTime) * 1e-9
-          var error = computeMaxError(cn, strikes, forward, tte, refPDE)
-          buffer += f"$spaceStep $timeStep $scheme $error%2.1e $elapsed%2.1e\n"
+        for (spaceStep <- spaceSteps) {
+          var buffer = ""
+          for (timeStep <- timeSteps) {
+            var startTime = System.nanoTime()
+            val cn = createHaganSABRSolver(scheme, spec, forward, tte, spaceStep, timeStep, FmaxTruncation)
+            cn.solve()
+            var endTime = System.nanoTime()
+            var elapsed = (endTime - startTime) * 1e-9
+            var error = computeMaxError(cn, strikes, forward, tte, refPDE)
+            buffer += f"$spaceStep $timeStep $scheme $error%2.1e $elapsed%2.1e\n"
+          }
+          print(buffer)
         }
-        print(buffer)
-      }
       }
     }
   }
@@ -745,7 +748,7 @@ class SABRSuite extends JUnitSuite {
     else f"$spaceStep $timeStep $scheme $error%2.1e $errorLocation%2.4f $elapsed%2.1e\n"
   }
 
-  @Test def testPDEDensityAccuracyHagan() {
+  test("PDEDensityAccuracyHagan") {
     val isLatex = false
     val alpha = 0.35;
     val nu = 1.0;
@@ -759,15 +762,15 @@ class SABRSuite extends JUnitSuite {
     val strikes = new UniformMesh1D(100, new Mesh1DBoundaries(forward * 0.2, forward * 2)).x
 
     var isCall = false
-    val refPDE = new HaganLMG3SABRDensitySolver(spec, forward, tte, 1280*4, 1280 * 4, FmaxTruncation)
+    val refPDE = new HaganLMG3SABRDensitySolver(spec, forward, tte, 1280 * 4, 1280 * 4, FmaxTruncation)
 
     refPDE.solve()
     val Qspline = CubicSpline.makeCubicSpline(refPDE.F, refPDE.Q0)
 
     var solver = new Li2011SORDRBlackVolatilitySolver(1e-12)
-    val schemes = Array("CN", "RAN", "LMG2", "LMG3", "LS", "TRBDF2", "TRBDF3", "RE")
+    val schemes = Array("CN", "RAN", "LMG2", "LMG3", "LS", "TRBDF2", "BDF2", "BDF3", "TRBDF3", "RE")
     val spaceSteps = Array(500) // Array(80, 160, 320, 640, 1280)
-    val timeSteps = Array(1,2,3,4, 5,6,7,8,9, 10, 20, 40, 80, 160, 320, 640, 1280)
+    val timeSteps = Array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 40, 80, 160, 320, 640, 1280)
     for (l <- 0 to 9) {
       //            println("SpaceSteps TimeSteps Scheme MaxError FError Time")
       println("SpaceSteps & TimeSteps & Scheme & MaxError & Time\\\\")
@@ -810,7 +813,7 @@ class SABRSuite extends JUnitSuite {
     var solver = new Li2011SORDRBlackVolatilitySolver(1e-12)
 
     val spaceSteps = Array(500) // Array(80, 160, 320, 640, 1280)
-    val timeSteps = Array(1, 2, 3, 4, 5, 6,7,8,9, 10, 20, 40, 80, 160, 320, 640, 1280)
+    val timeSteps = Array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 40, 80, 160, 320, 640, 1280)
     val schemes = Array("CN", "RAN", "LMG2", "LMG3", "LS", "TRBDF2", "TRBDF3", "RE")
     for (l <- 0 until 9) {
       println("SpaceSteps TimeSteps Scheme MaxError Time")
@@ -1155,7 +1158,7 @@ class SABRSuite extends JUnitSuite {
     //pdeMap += "LS" -> new HaganLawsonSwayneSABRDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
     //pdeMap += "TRBDF2" -> new HaganTRBDF2SABRDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
     //pdeMap += "RE" -> new HaganRichardsonEulerSABRDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
-   // pdeMap += "ADE" -> new HaganADESABRDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
+    // pdeMap += "ADE" -> new HaganADESABRDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
     //pdeMap += "TRBDF3" -> new HaganCNBDF3SABRDensitySolver(spec, forward, tte, xSteps, tSteps, FmaxTruncation)
     val h = pde.h
     val dt = pde.dt
@@ -1164,19 +1167,19 @@ class SABRSuite extends JUnitSuite {
     println("Scheme & ATM price & Q(f) & QL & QR\\\\")
     for (i <- 0 until 100) {
       val startTime = System.nanoTime()
-    for ((name, pde) <- pdeMap) {
-      pde.solve()
-      val j0 = pde.indexForward
-      val Qforward = pde.Q0(j0)
-      val QL = pde.QL
-      val QR = pde.QR
+      for ((name, pde) <- pdeMap) {
+        pde.solve()
+        val j0 = pde.indexForward
+        val Qforward = pde.Q0(j0)
+        val QL = pde.QL
+        val QR = pde.QR
 
-      val price = pde.price(false,forward)
-      println(f"$name & $price%2.12f & $Qforward%2.12f & $QL%2.12f & $QR%2.12f\\\\")
+        val price = pde.price(false, forward)
+        println(f"$name & $price%2.12f & $Qforward%2.12f & $QL%2.12f & $QR%2.12f\\\\")
 
-      //      println(f"$name & $h%2.12f & $Qforward%2.12f & $QL%2.12f & $QR%2.12f\\\\")
-    }
-      println("elapsed "+(System.nanoTime()-startTime)*1e-9)
+        //      println(f"$name & $h%2.12f & $Qforward%2.12f & $QL%2.12f & $QR%2.12f\\\\")
+      }
+      println("elapsed " + (System.nanoTime() - startTime) * 1e-9)
     }
 
   }

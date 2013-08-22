@@ -5,15 +5,16 @@ import quantscale.math.CubicSpline
 import scala.util.Sorting
 import quantscale.fdm.Epsilon
 
+
 class SMPoint(override val value: Double, override val isMiddle: Boolean = false, val width: Double = 0, val slope: Double = 0.1)
   extends Point(value: Double, isMiddle: Boolean) {
 
 }
 
 class SplineMesh1D(
-  private var _size: Int,
-  val boundaries: Mesh1DBoundaries,
-  var specialPoints: Array[SMPoint]) extends Mesh1D {
+                    private var _size: Int,
+                    val boundaries: Mesh1DBoundaries,
+                    var specialPoints: Array[SMPoint]) extends Mesh1D {
 
   private var _x: Array[Double] = null
 
@@ -21,6 +22,7 @@ class SplineMesh1D(
   build()
 
   override def x = _x
+
   override def size = _x.length
 
   private def init() {
@@ -56,18 +58,18 @@ class SplineMesh1D(
         uStar += (specialPoints(i).value);
       }
     }
-    if (math.abs(uPrime(uPrime.length-1)-boundaries.max)> Epsilon.MACHINE_EPSILON_SQRT) {
-    uPrime += (boundaries.max);
-    uStar += (boundaries.max);
+    if (math.abs(uPrime(uPrime.length - 1) - boundaries.max) > Epsilon.MACHINE_EPSILON_SQRT) {
+      uPrime += (boundaries.max);
+      uStar += (boundaries.max);
     }
     //TODO check that xmin and xmax are not already included
     val uPrimeArray = uPrime.toArray
     val uStarArray = uStar.toArray
     val derivatives = new Array[Double](uPrime.length)
-//    CubicSpline.computeHarmonicFirstDerivativePCHIM(uPrimeArray, uStarArray, derivatives)
+    //    CubicSpline.computeHarmonicFirstDerivativePCHIM(uPrimeArray, uStarArray, derivatives)
     CubicSpline.computeC2FirstDerivative(uPrimeArray, uStarArray, derivatives)
     val interpolator = CubicSpline.makeHermiteSpline(uPrimeArray, uStarArray, derivatives)
-//    val interpolator = CubicSpline.makeCubicSpline(uPrimeArray, uStarArray)
+    //    val interpolator = CubicSpline.makeCubicSpline(uPrimeArray, uStarArray)
     _x = new Array[Double](_size)
     for (i <- 0 until _size) {
       _x(i) = interpolator.value(delta * i + boundaries.min);
