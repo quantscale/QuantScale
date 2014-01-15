@@ -23,7 +23,7 @@ class RannacherCentralBSM1FMethod(specialPoints: Array[Double], payoff: FDPayoff
     c.solver = solver.copy()
     return c
   }
-  
+
   override def initSystem(specV: Parabolic1DFDSpec) {
     thetaMethod.initSystem(specV);
     thetaMethod.solver = solver;

@@ -1,4 +1,5 @@
 package quantscale.fdm.method
+
 import quantscale.fdm.UncertainBSM1FFDSpec
 import quantscale.fdm.payoff.FDPayoff
 import quantscale.fdm.TridiagonalMatrix
@@ -31,6 +32,7 @@ class TRBDF2UncertainBSM1FMethod(payoff: FDPayoff) extends Parabolic1DMethod {
   def copy(): Parabolic1DMethod = {
     return new TRBDF2UncertainBSM1FMethod(payoff)
   }
+
   override def initSystem(specV: Parabolic1DFDSpec) {
     _spec = specV.asInstanceOf[UncertainBSM1FFDSpec];
     tridiagonal = new TridiagonalMatrix(spec.grid.spaceVector.size);
@@ -56,7 +58,7 @@ class TRBDF2UncertainBSM1FMethod(payoff: FDPayoff) extends Parabolic1DMethod {
       val muMod = if (isDriftSpaceDependent) spec.b(t, dt, ex(j)) else mu;
 
       val gamma =
-        //        (fNew(j + 1) - 2 * fNew(j) + fNew(j - 1)) / (dxj * dxjplus)
+      //        (fNew(j + 1) - 2 * fNew(j) + fNew(j - 1)) / (dxj * dxjplus)
         2 * (fNew(j + 1) - fNew(j)) / ((x(j + 1) - x(j - 1)) * Math.abs(dxjplus)) +
           2 * (fNew(j - 1) - fNew(j)) / ((x(j + 1) - x(j - 1)) * Math.abs(dxj));
 

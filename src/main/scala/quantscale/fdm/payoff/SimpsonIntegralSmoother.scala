@@ -1,4 +1,5 @@
 package quantscale.fdm.payoff
+
 import quantscale.fdm.Epsilon
 import quantscale.fdm.mesh.MeshUtil
 
@@ -12,7 +13,7 @@ class SimpsonIntegralSmoother(discontinuities: Array[Double]) extends FDPayoffSm
   private var v3 = new Array[Double](INTEGRATION_STEPS);
 
   def findNearestIndex(v: Array[Double], z: Double): Int = {
-    var i = MeshUtil.findIndex(v, z);
+    val i = MeshUtil.findIndex(v, z);
     return i;
   }
 
@@ -58,7 +59,6 @@ class SimpsonIntegralSmoother(discontinuities: Array[Double]) extends FDPayoffSm
     v3 = payoff.state.price;
     // average
     var average = 0.0;
-    //FIXME integrate to discont-eps and then from discont+eps to h
     for (k <- 0 until INTEGRATION_STEPS) {
       // simpson formula for integral approximation
       average += (v1(k) + 4 * v2(k) + v3(k)) * dy / 6;

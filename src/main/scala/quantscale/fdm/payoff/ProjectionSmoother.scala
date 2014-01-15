@@ -12,7 +12,7 @@ class ProjectionSmoother(discontinuities: Array[Double]) extends FDPayoffSmoothe
     val space = payoff.space
     val size = payoff.space.length
 
-    val originalState = payoff.state.price;
+    val originalState = payoff.state;
     val originalSpace = payoff.space;
     val ooSpace = payoff.originalSpace;
 
@@ -45,12 +45,13 @@ class ProjectionSmoother(discontinuities: Array[Double]) extends FDPayoffSmoothe
     //    val x : Array[Double] = new Array[Double]
 //    println(M)
 //    println("F="+Arrays.toString(F))
-    solver.solve(M, F, originalState)
+    solver.solve(M, F, originalState.price)
 
     payoff.space = originalSpace;
     payoff.originalSpace = ooSpace;
-    payoff.state.price = originalState;
-//    println("state="+Arrays.toString(payoff.state))
+    payoff.state = originalState
+    //payoff.state.price = originalState;
+    //    println("state="+Arrays.toString(payoff.state))
   }
 
   def integrateLower(payoff: FDPayoff, lower: Double, upper: Double): Double = {

@@ -1,4 +1,6 @@
-package quantscale.fdm.method;
+package quantscale.fdm.method
+
+;
 
 import org.slf4j.LoggerFactory
 import quantscale.fdm.TridiagonalMatrix
@@ -38,9 +40,9 @@ class TGAParabolic1DMethod(payoff: FDPayoff, private var _a: Double = 0.54) exte
   private var lastLine1, lastLine2: OperatorLine = null
   private var solverND1, solverND2: TridiagonalSolverND = null
 
-  private var pool : ExecutorService = Executors.newFixedThreadPool(2)
-  private var solverThread1, solverThread2 : SolverThread= null
-  
+  private var pool: ExecutorService = Executors.newFixedThreadPool(2)
+  private var solverThread1, solverThread2: SolverThread = null
+
   def copy(): Parabolic1DMethod = {
     return new TGAParabolic1DMethod(payoff, _a)
   }
@@ -159,44 +161,44 @@ class TGAParabolic1DMethod(payoff: FDPayoff, private var _a: Double = 0.54) exte
       solverThread1 = new SolverThread(solverND1, tridiagonal1, rhs1, rhs1)
       solverThread2 = new SolverThread(solverND2, tridiagonal2, rhs2, rhs2)
     }
-//              solverND1.solve(tridiagonal1, rhs1.values, rhs1.values)
-//              solverND2.solve(tridiagonal2, rhs2.values, rhs2.values)
+    //              solverND1.solve(tridiagonal1, rhs1.values, rhs1.values)
+    //              solverND2.solve(tridiagonal2, rhs2.values, rhs2.values)
 
-//    val list = new ArrayList[Callable[Object]]()
-//          list.add(new Callable[Object]() {
-//            def call(): Object = {
-//              solverND1.solve(tridiagonal1, rhs1.values, rhs1.values)
-//              return null
-//            }
-//          })
-//            list.add(new Callable[Object]() {
-//            def call(): Object = {
-//              solverND2.solve(tridiagonal2, rhs2.values, rhs2.values)
-//              return null
-//            }
-//          })
-//        val fList = fjPool.invokeAll(list)
-//
-//        var i = fList.size()-1
-//        
-//        while (i >= 0) {
-//          fList.get(i).get()
-//          i-=1
-//        }
-        
-//    solverThread1 = new SolverThread(solverND1, tridiagonal1, rhs1, rhs1)
-//      solverThread2 = new SolverThread(solverND2, tridiagonal2, rhs2, rhs2)
-//         solverThread1.start()
-//         solverThread2.start()
-//         solverThread1.join()
-//         solverThread2.join()
+    //    val list = new ArrayList[Callable[Object]]()
+    //          list.add(new Callable[Object]() {
+    //            def call(): Object = {
+    //              solverND1.solve(tridiagonal1, rhs1.values, rhs1.values)
+    //              return null
+    //            }
+    //          })
+    //            list.add(new Callable[Object]() {
+    //            def call(): Object = {
+    //              solverND2.solve(tridiagonal2, rhs2.values, rhs2.values)
+    //              return null
+    //            }
+    //          })
+    //        val fList = fjPool.invokeAll(list)
+    //
+    //        var i = fList.size()-1
+    //
+    //        while (i >= 0) {
+    //          fList.get(i).get()
+    //          i-=1
+    //        }
+
+    //    solverThread1 = new SolverThread(solverND1, tridiagonal1, rhs1, rhs1)
+    //      solverThread2 = new SolverThread(solverND2, tridiagonal2, rhs2, rhs2)
+    //         solverThread1.start()
+    //         solverThread2.start()
+    //         solverThread1.join()
+    //         solverThread2.join()
     val f1 = fjPool.submit(solverThread1)
     val f2 = fjPool.submit(solverThread2)
     f1.get()
     f2.get()
-//    solverThread1.run()
-//    solverThread2.run()
-    
+    //    solverThread1.run()
+    //    solverThread2.run()
+
     for (d <- 0 until f.stateDimensions) {
       val fValues = f.values(d)
       val rhs1Values = rhs1.values(d)
@@ -212,7 +214,7 @@ class TGAParabolic1DMethod(payoff: FDPayoff, private var _a: Double = 0.54) exte
   override def shutdown() {
     fjPool.shutdown()
     pool.shutdown
-//    println("shutdown")
+    //    println("shutdown")
   }
 
 }
@@ -220,7 +222,7 @@ class TGAParabolic1DMethod(payoff: FDPayoff, private var _a: Double = 0.54) exte
 class SolverThread(solverND: TridiagonalSolverND, var tridiagonal: TridiagonalMatrix, var rhs: State, var result: State) extends Thread {
 
   override def run() {
-      solverND.solve(tridiagonal, rhs.values, result.values)
-//      println(result.values(0)(100))
+    solverND.solve(tridiagonal, rhs.values, result.values)
+    //      println(result.values(0)(100))
   }
 }

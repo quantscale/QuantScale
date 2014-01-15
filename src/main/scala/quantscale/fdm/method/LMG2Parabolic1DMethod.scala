@@ -1,4 +1,6 @@
-package quantscale.fdm.method;
+package quantscale.fdm.method
+
+;
 
 import org.slf4j.LoggerFactory
 import quantscale.fdm.TridiagonalMatrix
@@ -21,7 +23,9 @@ class LMG2Parabolic1DMethod(payoff: FDPayoff) extends Parabolic1DMethod {
   def copy(): Parabolic1DMethod = {
     return new LMG2Parabolic1DMethod(payoff)
   }
+
   override def spec = thetaMethod.spec
+
   override def initSystem(specV: Parabolic1DFDSpec) {
     thetaMethod.initSystem(specV);
     thetaMethod.solver = solver;
@@ -29,6 +33,9 @@ class LMG2Parabolic1DMethod(payoff: FDPayoff) extends Parabolic1DMethod {
     thetaMethod.lowerBoundary = lowerBoundary
     thetaMethod.upperBoundary = upperBoundary
     tridiagonalHalf = new TridiagonalMatrix(thetaMethod.tridiagonal.size)
+    fFull = null
+    fTemp = null
+    solverND = null
   }
 
   override def solve(currentTime: Double, dt: Double, f: State) {
@@ -42,8 +49,8 @@ class LMG2Parabolic1DMethod(payoff: FDPayoff) extends Parabolic1DMethod {
     if (solverND == null) {
       solverND = new TridiagonalSolverND(solver, f.stateDimensions)
     }
-    
-    
+
+
     //elliot ockendon does not preserve rhs
     solverND.solve(thetaMethod.tridiagonal, thetaMethod.rhs.values, fFull.values)
     val m = thetaMethod.tridiagonal.size

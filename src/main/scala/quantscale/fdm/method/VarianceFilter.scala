@@ -15,8 +15,9 @@ class UpWindingVarianceFilter extends VarianceFilter {
       correction = z
     }
     return variance * (1.0 + correction) //introduce artificial diffusion of 2nd order (see Fusai)
-  }  
+  }
 }
+
 class ScharfetterGummelVarianceFilter extends VarianceFilter {
 
   override def filter(variance: Double, muMod: Double, dxj: Double, dxjplus: Double): Double = {

@@ -1,4 +1,5 @@
 package quantscale.fdm.method
+
 import quantscale.fdm.TridiagonalMatrix
 import quantscale.fdm.ThomasTridiagonalSolver
 import quantscale.fdm.ConstantLogBSM1FFDSpec
@@ -21,9 +22,11 @@ class TRBDF2SingleCentralBSM1FMethod() extends Parabolic1DMethod {
   private var ex: Array[Double] = null;
 
   override def spec = _spec
-      def copy() : Parabolic1DMethod = {
+
+  def copy(): Parabolic1DMethod = {
     return new TRBDF2SingleCentralBSM1FMethod
   }
+
   override def initSystem(specV: Parabolic1DFDSpec) {
     _spec = specV
     tridiagonal = new TridiagonalMatrix(spec.grid.spaceVector.size);

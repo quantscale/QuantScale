@@ -15,8 +15,9 @@ import quantscale.fdm.TridiagonalSolverND
 object ThetaParabolic1DMethod {
   val THETA_CRANK_NICOLSON = 0.5
   val THETA_EXPLICIT = 1.0
-  val THETA_IMPLICIT = 0.0 
+  val THETA_IMPLICIT = 0.0
 }
+
 class ThetaParabolic1DMethod(var theta: Double = ThetaParabolic1DMethod.THETA_CRANK_NICOLSON) extends Parabolic1DMethod {
   final val logger = LoggerFactory.getLogger(getClass());
 
@@ -33,11 +34,11 @@ class ThetaParabolic1DMethod(var theta: Double = ThetaParabolic1DMethod.THETA_CR
   private var diffCache: DifferentialCache = null
   private var firstLine: OperatorLine = null
   private var lastLine: OperatorLine = null
-  private var solverND : TridiagonalSolverND = null
+  private var solverND: TridiagonalSolverND = null
 
   override def spec = _spec
-  
-  override def copy() : Parabolic1DMethod = {
+
+  override def copy(): Parabolic1DMethod = {
     val c = new ThetaParabolic1DMethod(theta)
     c.lowerBoundary = lowerBoundary
     c.upperBoundary = upperBoundary
@@ -56,6 +57,8 @@ class ThetaParabolic1DMethod(var theta: Double = ThetaParabolic1DMethod.THETA_CR
     diffCache = new DifferentialCache(x)
     firstLine = new OperatorLine(0, 3)
     lastLine = new OperatorLine(x.length - 3, x.length)
+    solverND = null
+    rhs = null
   }
 
 
@@ -64,14 +67,14 @@ class ThetaParabolic1DMethod(var theta: Double = ThetaParabolic1DMethod.THETA_CR
     computeDrift(ex, t, dt, driftVector)
     computeVariance(ex, t, dt, driftVector, varianceVector)
     if (theta == ThetaParabolic1DMethod.THETA_EXPLICIT) {
-       val multiplier = dt
-        val A = tridiagonal
-        A.fill(0.0)
-        A.plusD2(1, x.length - 1, diffCache, varianceVector, 0.5 * multiplier)
-          .plusD1(1, x.length - 1, diffCache, driftVector, multiplier)
-          .plusD0(1, x.length - 1, discountVector, -multiplier, 1.0)
+      val multiplier = dt
+      val A = tridiagonal
+      A.fill(0.0)
+      A.plusD2(1, x.length - 1, diffCache, varianceVector, 0.5 * multiplier)
+        .plusD1(1, x.length - 1, diffCache, driftVector, multiplier)
+        .plusD0(1, x.length - 1, discountVector, -multiplier, 1.0)
     } else {
-      val multiplier = -(1 - theta) * dt 
+      val multiplier = -(1 - theta) * dt
       val A = tridiagonal
       A.fill(0.0)
       A.plusD2(1, x.length - 1, diffCache, varianceVector, 0.5 * multiplier)
@@ -104,7 +107,7 @@ class ThetaParabolic1DMethod(var theta: Double = ThetaParabolic1DMethod.THETA_CR
   }
 
   def initBoundaries(t: Double, dt: Double, f: State) {
-    val multiplier = if (theta == ThetaParabolic1DMethod.THETA_EXPLICIT) dt else -(1 - theta) * dt 
+    val multiplier = if (theta == ThetaParabolic1DMethod.THETA_EXPLICIT) dt else -(1 - theta) * dt
     lowerBoundary.makeLine(0, x, varianceVector(0) * 0.5, driftVector(0), -discountVector(0), multiplier, firstLine)
     val m = x.length - 1
     upperBoundary.makeLine(m, x, varianceVector(m) * 0.5, driftVector(m), -discountVector(m), multiplier, lastLine)
@@ -114,19 +117,19 @@ class ThetaParabolic1DMethod(var theta: Double = ThetaParabolic1DMethod.THETA_CR
   }
 
   //supposes that left hand side is initialized
-  def initRightHandSide(f: State, alpha: Double=1.0) {
+  def initRightHandSide(f: State, alpha: Double = 1.0) {
     if (rhs == null) rhs = new State(f.stateDimensions, f.size)
     for (d <- 0 until rhs.stateDimensions) {
       val rhsValues = rhs.values(d)
       val fValues = f.values(d)
       if (theta == ThetaParabolic1DMethod.THETA_IMPLICIT) {
         if (alpha == 1.0) {
-        System.arraycopy(fValues, 0, rhsValues, 0, x.length)
+          System.arraycopy(fValues, 0, rhsValues, 0, x.length)
         } else {
-          var j = x.length-1
-          while (j>=0) {
-            rhsValues(j) = alpha*fValues(j)
-            j-=1
+          var j = x.length - 1
+          while (j >= 0) {
+            rhsValues(j) = alpha * fValues(j)
+            j -= 1
           }
         }
       } else if (theta == ThetaParabolic1DMethod.THETA_EXPLICIT) {
@@ -155,16 +158,16 @@ class ThetaParabolic1DMethod(var theta: Double = ThetaParabolic1DMethod.THETA_CR
     }
     if (theta == ThetaParabolic1DMethod.THETA_EXPLICIT) {
       for (d <- 0 until f.stateDimensions) {
-        tridiagonal.multiply(rhs.values(d),f.values(d))
+        tridiagonal.multiply(rhs.values(d), f.values(d))
       }
     } else {
       if (solverND == null) {
         solverND = new TridiagonalSolverND(solver, f.stateDimensions)
       }
       solverND.solve(tridiagonal, rhs.values, f.values)
-//      for (d<-0 until f.stateDimensions) {
-//        solver.solve(tridiagonal, rhs.values(d), f.values(d))
-//      }
+      //      for (d<-0 until f.stateDimensions) {
+      //        solver.solve(tridiagonal, rhs.values(d), f.values(d))
+      //      }
     }
   }
 }

@@ -1,4 +1,5 @@
 package quantscale.fdm.method
+
 import quantscale.fdm.BSM1FFDSpec
 import quantscale.fdm.Epsilon
 

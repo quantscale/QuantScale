@@ -1,4 +1,5 @@
 package test.quantscale.fdm
+
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.mutable.HashMap
 import org.junit.runner.RunWith
@@ -13,12 +14,7 @@ import quantscale.fdm.method.SmoothCrankNicolsonCentralBSM1FMethod
 import quantscale.fdm.method.TRBDF2Parabolic1DMethod
 import quantscale.fdm.method.TRBDF2SingleCentralBSM1FMethod
 import quantscale.fdm.method.ThetaParabolic1DMethod
-import quantscale.fdm.payoff.DigitalFDPayoff
-import quantscale.fdm.payoff.FDPayoff
-import quantscale.fdm.payoff.SimpsonIntegralSmoother
-import quantscale.fdm.payoff.SplineSmoother
-import quantscale.fdm.payoff.VanillaAmericanFDPayoff
-import quantscale.fdm.payoff.VanillaFDPayoff
+import quantscale.fdm.payoff._
 import quantscale.fdm.transform.ExpTransformation
 import quantscale.fdm.ConstantBSM1FFDSpec
 import quantscale.fdm.ConstantLogBSM1FFDSpec
@@ -30,8 +26,7 @@ import quantscale.fdm.TridiagonalSolver
 import quantscale.math.CubicPP
 import quantscale.math.CubicSpline
 import org.scalatest.junit.JUnitRunner
-import quantscale.fdm.mesh.UniformMesh2D
-import quantscale.fdm.mesh.MeshBoundaries
+import quantscale.fdm.mesh._
 import quantscale.fdm.listener.Price2DListener
 import quantscale.fdm.listener.Price2DListener
 import java.io.PrintWriter
@@ -195,7 +190,7 @@ class ConvergenceSuite extends FunSuite {
     }
     method.smearingReducer = null
     var pricer = new FDMSolver1D(spec, method, solver);
-    
+
     pricer.smoother = smoother;
     var startTime = System.nanoTime();
     pricer.solve(payoff);
@@ -283,10 +278,10 @@ class ConvergenceSuite extends FunSuite {
         line = new PriceLine("TGAS", "BS", spaceSteps, timeSteps, Double.NaN, Double.NaN, Double.NaN);
         priceOSullivan(line, boundaries, strike, payoff, spot, vol, mu, r, reference);
         System.out.println(line);
-         line = new PriceLine("TRBDF2", "SOR", spaceSteps, timeSteps, Double.NaN, Double.NaN, Double.NaN);
+        line = new PriceLine("TRBDF2", "SOR", spaceSteps, timeSteps, Double.NaN, Double.NaN, Double.NaN);
         priceOSullivan(line, boundaries, strike, payoff, spot, vol, mu, r, reference);
         System.out.println(line);
-      line = new PriceLine("LMG2", "SOR", spaceSteps, timeSteps, Double.NaN, Double.NaN, Double.NaN);
+        line = new PriceLine("LMG2", "SOR", spaceSteps, timeSteps, Double.NaN, Double.NaN, Double.NaN);
         priceOSullivan(line, boundaries, strike, payoff, spot, vol, mu, r, reference);
         System.out.println(line);
         line = new PriceLine("LMG3", "SOR", spaceSteps, timeSteps, Double.NaN, Double.NaN, Double.NaN);
@@ -357,6 +352,7 @@ class ConvergenceSuite extends FunSuite {
     testForsythLog(tte, r, mu, spot, vol, payoff, strike, priceRef, timeSize, spaceSize, new RannacherCentralBSM1FMethod(Array(tte)), "Thomas");
 
   }
+
   def testForsythLog(tte: Double, r: Double, mu: Double, spot: Double, vol: Double, payoff: FDPayoff, strike: Double, priceRef: Double, timeSize: Array[Int], spaceSize: Array[Int], method: Parabolic1DMethod, solverType: String) {
     var previousPriceCN = Double.NaN;
     var previousChangeCN = Double.NaN;
@@ -624,6 +620,7 @@ class ConvergenceSuite extends FunSuite {
   class GilesPriceLine(m: String, s: String, xLen: Int, tLen: Int, p: Double, e: Double, t: Double, var maxError: Double, var maxGammaError: Double = Double.NaN) extends PriceLine(m: String, s: String, xLen: Int, tLen: Int, p: Double, e: Double, t: Double) {
     var ratio: Double = Double.NaN;
     var priceArray: Array[Double] = null;
+
     override def toString(): String = {
       var name = method;
       if (solver.length() > 0) {
@@ -640,6 +637,7 @@ class ConvergenceSuite extends FunSuite {
       return "%d & %d & %.2e & %.2e & %.2e & %.1f \\\\".format(spaceSteps, timeSteps, maxGammaError, maxError, time, ratio);
     }
   }
+
   def priceGilesLog(line: GilesPriceLine, boundaries: MeshBoundaries, strike: Double, payoff: FDPayoff, spot: Double, vol: Double, mu: Double, r: Double, priceRef: CubicPP) {
     val logBounds = new MeshBoundaries(boundaries.firstTime, boundaries.lastTime, Math.log(boundaries.bottomSpace / spot), Math.log(boundaries.topSpace / spot))
     val grid: UniformMesh2D = new UniformMesh2D(
@@ -712,6 +710,7 @@ class ConvergenceSuite extends FunSuite {
       line.maxGammaError = computeMaxGammaError(x, priceArray, priceRef, min, max);
     }
   }
+
   test("giles-log-american") {
     val tte = 1.0;
 
@@ -850,6 +849,7 @@ class ConvergenceSuite extends FunSuite {
     }
     return maxError;
   }
+
   def makePriceFromFile(fileName: String): CubicPP = {
     val source = scala.io.Source.fromFile(fileName)
     val lines = source.getLines();
@@ -988,10 +988,264 @@ class ConvergenceSuite extends FunSuite {
 
   }
 
+
+  test("giles-european-projection") {
+    val tte = 1.0;
+    var spot = 100.0;
+    var strike = 95.0;
+    val vol = 0.3;
+    val mu = 0.0;
+    val r = 0.0;
+    val priceAnal =
+      (BlackScholesVanillaEuropean.priceEuropeanVanilla(false,
+        strike + 1e-5,
+        spot,
+        BlackScholesVanillaEuropean.variance(vol, tte),
+        BlackScholesVanillaEuropean.df(mu, tte),
+        BlackScholesVanillaEuropean.df(r, tte)) - BlackScholesVanillaEuropean.priceEuropeanVanilla(false,
+        strike - 1e-5,
+        spot,
+        BlackScholesVanillaEuropean.variance(vol, tte),
+        BlackScholesVanillaEuropean.df(mu, tte),
+        BlackScholesVanillaEuropean.df(r, tte))) / (2 * 1e-5);
+
+    //      BlackScholesVanillaEuropean.priceEuropeanVanilla(false,
+    //      strike,
+    //      spot,
+    //      BlackScholesVanillaEuropean.variance(vol, tte),
+    //      BlackScholesVanillaEuropean.df(mu, tte),
+    //      BlackScholesVanillaEuropean.df(r, tte));
+
+    val lambda = Array(1.0, 4.0);
+    val spaceSize = Array(40, 80, 160, 320, 640, 1280, 2560);
+    println("analytic price=" + priceAnal)
+    System.out.println("lambda spacesteps timesteps dx dt CNprice CNtime CN TRBDF2price TRBDF2time TRBDF2");
+
+    for (k <- 0 until lambda.length) {
+      for (i <- 0 until spaceSize.length) {
+        val timeSize = Math.round(spaceSize(i) / lambda(k)).toInt
+        var grid: Mesh2D = new UniformMesh2D(
+          spaceSize(i),
+          timeSize,
+          MeshBoundaries.makeBoundariesWithStdDev(tte, spot, vol, BlackScholesVanillaEuropean.df(mu, tte), 3),
+          strike);
+
+        var spec = new ConstantBSM1FFDSpec(
+          grid,
+          vol,
+          mu,
+          r)
+
+        val solver = new ThomasTridiagonalSolver();
+        var payoff = new DigitalFDPayoff(false, strike, 1.0, tte)
+        //  new VanillaFDPayoff(false, strike, tte);
+        val smoothers = Array[FDPayoffSmoother](new NoFDPayoffSmoother(), new SimpsonIntegralSmoother(Array(strike)), new ProjectionSmoother(Array(strike)))
+        for (smoother <- smoothers) {
+
+          var method: Parabolic1DMethod = new ThetaParabolic1DMethod();
+          var pricer = new FDMSolver1D(spec, method, solver);
+
+          pricer.smoother = smoother;
+          var startTime = System.nanoTime();
+          pricer.solve(payoff);
+          var spline = CubicSpline.makeCubicSpline(grid.spaceVector, pricer.price)
+          val timeCN = (System.nanoTime() - startTime) * 1e-9;
+          val priceCN = spline.value(spot);
+          val errorCN = Math.abs(priceCN - priceAnal);
+
+          method = new TRBDF2Parabolic1DMethod(payoff);
+          pricer = new FDMSolver1D(spec, method, solver);
+
+          pricer.smoother = smoother;
+          startTime = System.nanoTime();
+          pricer.solve(payoff);
+          spline = CubicSpline.makeCubicSpline(grid.spaceVector, pricer.price)
+          val timeTRBDF2 = (System.nanoTime() - startTime) * 1e-9;
+          val priceTRBDF2 = spline.value(spot);
+          val errorTRBDF2 = Math.abs(priceTRBDF2 - priceAnal);
+
+          val dx = grid.spaceVector(2) - grid.spaceVector(1);
+          val dt = 0;
+          println(smoother.getClass().getSimpleName() + " " + lambda(k) +
+            " " + grid.spaceSize +
+            " " + grid.timeIterator.length +
+            " " + dx + " " + dt +
+            " " + priceCN + " " + timeCN + " " + errorCN +
+            " " + priceTRBDF2 + " " + timeTRBDF2 + " " + errorTRBDF2);
+        }
+        val boundaries = MeshBoundaries.makeBoundariesWithStdDev(tte, spot, vol, BlackScholesVanillaEuropean.df(mu, tte), 3)
+        grid = new StaticAdaptiveMesh2D(new UniformMesh1D(spaceSize(i), boundaries.spaceBoundaries, strike, true),
+          new UniformMesh1D(timeSize, boundaries.timeBoundaries))
+        spec = new ConstantBSM1FFDSpec(
+          grid,
+          vol,
+          mu,
+          r)
+
+        var method: Parabolic1DMethod = new ThetaParabolic1DMethod();
+        var pricer = new FDMSolver1D(spec, method, solver);
+
+        pricer.smoother = null;
+        var startTime = System.nanoTime();
+        pricer.solve(payoff);
+        var spline = CubicSpline.makeCubicSpline(grid.spaceVector, pricer.price)
+        val timeCN = (System.nanoTime() - startTime) * 1e-9;
+        val priceCN = spline.value(spot);
+        val errorCN = Math.abs(priceCN - priceAnal);
+
+        method = new TRBDF2Parabolic1DMethod(payoff);
+        pricer = new FDMSolver1D(spec, method, solver);
+
+        pricer.smoother = null;
+        startTime = System.nanoTime();
+        pricer.solve(payoff);
+        spline = CubicSpline.makeCubicSpline(grid.spaceVector, pricer.price)
+        val timeTRBDF2 = (System.nanoTime() - startTime) * 1e-9;
+        val priceTRBDF2 = spline.value(spot);
+        val errorTRBDF2 = Math.abs(priceTRBDF2 - priceAnal);
+
+        val dx = grid.spaceVector(2) - grid.spaceVector(1);
+        val dt = 0;
+        println("middle" + " " + lambda(k) +
+          " " + grid.spaceSize +
+          " " + grid.timeIterator.length +
+          " " + dx + " " + dt +
+          " " + priceCN + " " + timeCN + " " + errorCN +
+          " " + priceTRBDF2 + " " + timeTRBDF2 + " " + errorTRBDF2);
+      }
+    }
+
+  }
+
+  test("giles-european-log-projection") {
+    val tte = 1.0;
+    var spot = 100.0;
+    var strike = 95.0;
+    val vol = 0.3;
+    val mu = 0.0;
+    val r = 0.0;
+    val priceAnal =
+    //      (BlackScholesVanillaEuropean.priceEuropeanVanilla(false,
+    //        strike+1e-5,
+    //        spot,
+    //        BlackScholesVanillaEuropean.variance(vol, tte),
+    //        BlackScholesVanillaEuropean.df(mu, tte),
+    //        BlackScholesVanillaEuropean.df(r, tte)) - BlackScholesVanillaEuropean.priceEuropeanVanilla(false,
+    //        strike-1e-5,
+    //        spot,
+    //        BlackScholesVanillaEuropean.variance(vol, tte),
+    //        BlackScholesVanillaEuropean.df(mu, tte),
+    //        BlackScholesVanillaEuropean.df(r, tte)))/(2*1e-5);
+
+      BlackScholesVanillaEuropean.priceEuropeanVanilla(false,
+        strike,
+        spot,
+        BlackScholesVanillaEuropean.variance(vol, tte),
+        BlackScholesVanillaEuropean.df(mu, tte),
+        BlackScholesVanillaEuropean.df(r, tte));
+
+    val lambda = Array(1.0, 4.0);
+    val spaceSize = Array(40, 80, 160, 320, 640, 1280, 2560);
+    println("analytic price=" + priceAnal)
+    System.out.println("lambda spacesteps timesteps dx dt CNprice CNtime CN TRBDF2price TRBDF2time TRBDF2");
+
+    for (k <- 0 until lambda.length) {
+      for (i <- 0 until spaceSize.length) {
+        val timeSize = Math.round(spaceSize(i) / lambda(k)).toInt
+        val boundaries = MeshBoundaries.makeBoundariesWithStdDev(tte, spot, vol, BlackScholesVanillaEuropean.df(mu, tte), 3)
+        val transform = new ExpTransformation(strike)
+        var grid: Mesh2D = new StaticAdaptiveMesh2D(new TransformedUniformMesh1D(transform, spaceSize(i), new Mesh1DBoundaries(transform.inverseValue(boundaries.bottomSpace), transform.inverseValue(boundaries.topSpace)), new Point(transform.inverseValue(strike), false), true),
+          new UniformMesh1D(timeSize, boundaries.timeBoundaries))
+
+        var spec = new ConstantBSM1FFDSpec(
+          grid,
+          vol,
+          mu,
+          r)
+
+        val solver = new ThomasTridiagonalSolver();
+        var payoff = // new DigitalFDPayoff(false, strike, 1.0, tte)
+          new VanillaFDPayoff(false, strike, tte);
+        val smoothers = Array[FDPayoffSmoother](new NoFDPayoffSmoother(), new SimpsonIntegralSmoother(Array(strike)), new ProjectionSmoother(Array(strike)))
+        for (smoother <- smoothers) {
+
+          var method: Parabolic1DMethod = new ThetaParabolic1DMethod();
+          var pricer = new FDMSolver1D(spec, method, solver);
+
+          pricer.smoother = smoother;
+          var startTime = System.nanoTime();
+          pricer.solve(payoff);
+          var spline = CubicSpline.makeCubicSpline(grid.spaceVector, pricer.price)
+          val timeCN = (System.nanoTime() - startTime) * 1e-9;
+          val priceCN = spline.value(spot);
+          val errorCN = Math.abs(priceCN - priceAnal);
+
+          method = new TRBDF2Parabolic1DMethod(payoff);
+          pricer = new FDMSolver1D(spec, method, solver);
+
+          pricer.smoother = smoother;
+          startTime = System.nanoTime();
+          pricer.solve(payoff);
+          spline = CubicSpline.makeCubicSpline(grid.spaceVector, pricer.price)
+          val timeTRBDF2 = (System.nanoTime() - startTime) * 1e-9;
+          val priceTRBDF2 = spline.value(spot);
+          val errorTRBDF2 = Math.abs(priceTRBDF2 - priceAnal);
+
+          val dx = grid.spaceVector(2) - grid.spaceVector(1);
+          val dt = 0;
+          println(smoother.getClass().getSimpleName() + " " + lambda(k) +
+            " " + grid.spaceSize +
+            " " + grid.timeIterator.length +
+            " " + dx + " " + dt +
+            " " + priceCN + " " + timeCN + " " + errorCN +
+            " " + priceTRBDF2 + " " + timeTRBDF2 + " " + errorTRBDF2);
+        }
+        grid = new StaticAdaptiveMesh2D(new TransformedUniformMesh1D(transform, spaceSize(i), new Mesh1DBoundaries(transform.inverseValue(boundaries.bottomSpace), transform.inverseValue(boundaries.topSpace)), new Point(transform.inverseValue(strike), true), true),
+          new UniformMesh1D(timeSize, boundaries.timeBoundaries))
+        spec = new ConstantBSM1FFDSpec(
+          grid,
+          vol,
+          mu,
+          r)
+
+        var method: Parabolic1DMethod = new ThetaParabolic1DMethod();
+        var pricer = new FDMSolver1D(spec, method, solver);
+
+        pricer.smoother = null;
+        var startTime = System.nanoTime();
+        pricer.solve(payoff);
+        var spline = CubicSpline.makeCubicSpline(grid.spaceVector, pricer.price)
+        val timeCN = (System.nanoTime() - startTime) * 1e-9;
+        val priceCN = spline.value(spot);
+        val errorCN = Math.abs(priceCN - priceAnal);
+
+        method = new TRBDF2Parabolic1DMethod(payoff);
+        pricer = new FDMSolver1D(spec, method, solver);
+
+        pricer.smoother = null;
+        startTime = System.nanoTime();
+        pricer.solve(payoff);
+        spline = CubicSpline.makeCubicSpline(grid.spaceVector, pricer.price)
+        val timeTRBDF2 = (System.nanoTime() - startTime) * 1e-9;
+        val priceTRBDF2 = spline.value(spot);
+        val errorTRBDF2 = Math.abs(priceTRBDF2 - priceAnal);
+
+        val dx = grid.spaceVector(2) - grid.spaceVector(1);
+        val dt = 0;
+        println("middle" + " " + lambda(k) +
+          " " + grid.spaceSize +
+          " " + grid.timeIterator.length +
+          " " + dx + " " + dt +
+          " " + priceCN + " " + timeCN + " " + errorCN +
+          " " + priceTRBDF2 + " " + timeTRBDF2 + " " + errorTRBDF2);
+      }
+    }
+
+  }
   test("Digital Forsyth from uncertain") {
     var spaceSize = Array(60, 120, 240, 480, 960, 960 * 2, 960 * 4)
     var timeSize =
-      //     Array(10, 20, 40, 80, 160, 320, 640)
+    //     Array(10, 20, 40, 80, 160, 320, 640)
       Array(25, 50, 100, 200, 400, 800, 1600) //, 1600*2)
     var spot = 100.0
 

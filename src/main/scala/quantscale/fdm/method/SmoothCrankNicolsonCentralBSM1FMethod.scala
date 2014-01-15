@@ -1,4 +1,5 @@
 package quantscale.fdm.method
+
 import quantscale.fdm.Epsilon
 import quantscale.fdm.TridiagonalMatrix
 import quantscale.fdm.payoff.FDPayoff
@@ -34,10 +35,13 @@ class SmoothCrankNicolsonCentralBSM1FMethod(specialPoints: Array[Double], var pa
 
   private var specialIndex: Int = 0;
   private var solverND: TridiagonalSolverND = null
+
   override def spec = thetaMethod.spec
-    def copy() : Parabolic1DMethod = {
+
+  def copy(): Parabolic1DMethod = {
     return new SmoothCrankNicolsonCentralBSM1FMethod(specialPoints, payoff)
   }
+
   override def initSystem(specV: Parabolic1DFDSpec) {
     thetaMethod.initSystem(specV);
     thetaMethod.solver = solver;

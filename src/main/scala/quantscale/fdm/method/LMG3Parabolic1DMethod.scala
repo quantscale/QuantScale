@@ -1,4 +1,6 @@
-package quantscale.fdm.method;
+package quantscale.fdm.method
+
+;
 
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -18,13 +20,15 @@ class LMG3Parabolic1DMethod(payoff: FDPayoff) extends Parabolic1DMethod {
   private var f1, f2, f2tmp, f3tmp: State = null
 
   private var specialIndex: Int = 0;
+
   override def spec = thetaMethod.spec
 
   private var solverND: TridiagonalSolverND = null
 
-    def copy() : Parabolic1DMethod = {
+  def copy(): Parabolic1DMethod = {
     return new LMG3Parabolic1DMethod(payoff)
   }
+
   override def initSystem(specV: Parabolic1DFDSpec) {
     thetaMethod.initSystem(specV)
     thetaMethod.solver = solver
@@ -75,7 +79,7 @@ class LMG3Parabolic1DMethod(payoff: FDPayoff) extends Parabolic1DMethod {
     thetaMethod.initBoundaries(currentTime, dt * 2 / 3, f2tmp)
     if (payoff != null) payoff.setTime(currentTime);
     //clone f?
-    solverND.solve(tridiagonalHalf,thetaMethod.rhs.values, f2.values)
+    solverND.solve(tridiagonalHalf, thetaMethod.rhs.values, f2.values)
 
     thetaMethod.tridiagonal = tridiagonalThird
     thetaMethod.initRightHandSide(f2tmp)

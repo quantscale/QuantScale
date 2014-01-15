@@ -1,7 +1,6 @@
 package quantscale.analytic
 
-import quantscale.fdm.mesh.UniformMesh1D
-import quantscale.fdm.mesh.Mesh1DBoundaries
+import quantscale.fdm.mesh.{Mesh1D, UniformMesh1D, Mesh1DBoundaries}
 import quantscale.fdm.TridiagonalMatrix
 import quantscale.fdm.ThomasTridiagonalSolver
 import quantscale.fdm.GridUtil
@@ -15,18 +14,26 @@ import quantscale.fdm.method.Parabolic1DBoundaryFactory
 import quantscale.fdm.method.ForwardPartialOrder2Parabolic1DBoundaryFactory
 import quantscale.fdm.OperatorLine
 import quantscale.fdm.method.BackwardPartialOrder2Parabolic1DBoundaryFactory
-import quantscale.math.CubicSpline
-import quantscale.math.CubicPP
+import quantscale.math.{RungeKuttaODESolver, Function2D, CubicSpline, CubicPP}
 import quantscale.fdm.TridiagonalSolver
+import scala.math
+import scala.math
 
 /**
  * dF = v*(F+b)^beta dW1, F(0) = f
  * dv = nu*v*dW2, v(0)=alpha
  */
-class SABRModelSpec(val alpha: Double, val beta: Double, val nu: Double, val rho: Double, val b : Double = 0.0) {
+class SABRModelSpec(val alpha: Double, val beta: Double, val nu: Double, val rho: Double, val b: Double = 0.0) {
 
 }
+
+class ZABRModelSpec(val alpha: Double, val beta: Double, val nu: Double, val rho: Double, val gamma: Double) {
+
+}
+
 object SABRVanilla {
+  private val AndreasenHugeSize = 1950
+
   def priceBenhamou(spec: SABRModelSpec, isCall: Boolean, strike: Double, forward: Double, tte: Double): Double = {
     val k = strike
     val f = forward
@@ -34,7 +41,8 @@ object SABRVanilla {
     val alpha = spec.alpha
     val rho = spec.rho
     val nu = spec.nu
-    val f0 = k; // projected fwd as suggested by Benhamou et al. makes z0=0
+    val f0 = k;
+    // projected fwd as suggested by Benhamou et al. makes z0=0
     val f1beta = math.pow(f, 1 - beta)
     val k1beta = math.pow(k, 1 - beta)
     val f01beta = k1beta
@@ -87,6 +95,7 @@ object SABRVanilla {
     sum.multiply(2 / math.Pi * math.exp(-x * x))
     return sum.add(firstTerm.add(erf))
   }
+
   def impliedVolatilityHagan(spec: SABRModelSpec, forward: Double, strike: Double, tte: Double): Double = {
     val nu = spec.nu
     val alpha = spec.alpha
@@ -162,20 +171,25 @@ object SABRVanilla {
   }
 
   def priceAndreasenHuge(isCall: Boolean, strike: Double, spec: SABRModelSpec, forward: Double, tte: Double): Double = {
-    val spline = priceAndreasenHuge(isCall, spec, forward, tte)
+    val spline = priceAndreasenHuge(isCall, spec, forward, tte, true)
     return spline.value(strike)
   }
 
-  def computeFmax(spec: SABRModelSpec, forward: Double, tte: Double) : Double = {
+  def priceAndreasenHugeZABR(isCall: Boolean, strike: Double, spec: ZABRModelSpec, forward: Double, tte: Double): Double = {
+    val spline = priceAndreasenHugeZABR(isCall, spec, forward, tte, true)
+    return spline.value(strike)
+  }
+
+  def computeFmax(spec: SABRModelSpec, forward: Double, tte: Double): Double = {
     val dev = 4
-    val theta = 0.5*spec.nu*dev*math.sqrt(tte)
-    val Fmax = forward*math.exp(2*theta)
-    val z = 2/spec.nu*math.sinh(theta)*(math.cosh(theta)+spec.rho*math.sinh(theta))
-    val fpow = z*(spec.alpha)*(1-spec.beta)+math.pow(forward, 1-spec.beta)
-    val Fmax2 = math.pow(fpow, 1/(1-spec.beta))
+    val theta = 0.5 * spec.nu * dev * math.sqrt(tte)
+    val Fmax = forward * math.exp(2 * theta)
+    val z = 2 / spec.nu * math.sinh(theta) * (math.cosh(theta) + spec.rho * math.sinh(theta))
+    val fpow = z * (spec.alpha) * (1 - spec.beta) + math.pow(forward, 1 - spec.beta)
+    val Fmax2 = math.pow(fpow, 1 / (1 - spec.beta))
     return Fmax
   }
-  
+
   def priceAndreasenHuge(isCall: Boolean, spec: SABRModelSpec, forward: Double, tte: Double, withLaplaceCorrection: Boolean = true): CubicPP = {
     val nu = spec.nu
     val alpha = spec.alpha
@@ -186,13 +200,13 @@ object SABRVanilla {
     //later the forward vol is used to price with 1 step euler FD scheme.
     //we could invert back this price to find real implied vol for comparison
 
-    val fsteps = 10000
+    val fsteps = AndreasenHugeSize
     val fmin = 0
-    var fmax =  math.min(10*forward,computeFmax(spec, forward, tte))
-    var deltaf = (fmax-fmin)/fsteps
-    val findex = ((forward-fmin)/deltaf).toInt
-    deltaf = (forward-fmin)/findex
-    fmax = (fsteps-1)*deltaf
+    var fmax = 10 * forward //math.min(10*forward,computeFmax(spec, forward, tte))
+    var deltaf = (fmax - fmin) / fsteps
+    val findex = ((forward - fmin) / deltaf).toInt
+    deltaf = (forward - fmin) / findex
+    fmax = (fsteps - 1) * deltaf
     val mesh = new UniformMesh1D(fsteps, new Mesh1DBoundaries(fmin, fmax))
     val rhs = Array.ofDim[Double](mesh.size)
     val lhs = new TridiagonalMatrix(mesh.size)
@@ -225,16 +239,16 @@ object SABRVanilla {
     val diffCache = new DifferentialCache(mesh.x)
     lhs.plusD2(1, lhs.size - 1, diffCache, varianceVector, -0.5 * tte)
     //zero gamma boundary
-    lhs.upper(0) = 0.0
-    lhs.middle(0) = 1.0
-    lhs.lower(lhs.size - 1) = 0.0
-    lhs.middle(lhs.size - 1) = 1.0
+    //    lhs.upper(0) = 0.0
+    //    lhs.middle(0) = 1.0
+    //    lhs.lower(lhs.size - 1) = 0.0
+    //    lhs.middle(lhs.size - 1) = 1.0
 
     //andreasen huge boundary
-//    val normalImpliedVol0 = normalVolatilityAndreasenHuge(spec, forward, mesh.x(0), tte)
-//    rhs(0) = BachelierVanillaEuropean.price(isCall, mesh.x(0), forward, normalImpliedVol0, tte)
-//    val normalImpliedVoln = normalVolatilityAndreasenHuge(spec, forward, mesh.x(lhs.size - 1), tte)
-//    rhs(lhs.size - 1) = BachelierVanillaEuropean.price(isCall, mesh.x(lhs.size - 1), forward, normalImpliedVoln, tte)
+    val normalImpliedVol0 = normalVolatilityAndreasenHuge(spec, forward, mesh.x(0), tte)
+    rhs(0) = BachelierVanillaEuropean.price(isCall, mesh.x(0), forward, normalImpliedVol0, tte)
+    val normalImpliedVoln = normalVolatilityAndreasenHuge(spec, forward, mesh.x(lhs.size - 1), tte)
+    rhs(lhs.size - 1) = BachelierVanillaEuropean.price(isCall, mesh.x(lhs.size - 1), forward, normalImpliedVoln, tte)
 
     //order 1 boundary
     //    val    firstLine = new OperatorLine(0, 3)
@@ -248,6 +262,136 @@ object SABRVanilla {
     solver.init(mesh.size)
     solver.solve(lhs, rhs, price)
     return CubicSpline.makeBesselSpline(mesh.x, price)
+  }
+
+
+  private def solveZABRODE(spec: ZABRModelSpec, y: Double): (Double, Double) = {
+    val gamma = spec.gamma
+    val nu = spec.nu
+    val rho = spec.rho
+
+    val odeFunction = new Function2D {
+      def value(y: Double, f: Double): Double = {
+        val A = 1 + (gamma - 2) * (gamma - 2) * nu * nu * y * y + 2 * rho * (gamma - 2) * nu * y
+        val B = 2 * rho * (1 - gamma) * nu + 2 * (1 - gamma) * (gamma - 2) * nu * nu * y
+        val C = (1 - gamma) * (1 - gamma) * nu * nu
+        val delta = math.max(0, B * B * f * f - 4 * A * (C * f * f - 1))
+        val oderhs = (-B * f + math.sqrt(delta)) / (2 * A)
+        return oderhs
+      }
+    }
+    val size = 50
+    val ya = Array.ofDim[Double](size)
+    var i = 0
+    while (i < size) {
+      ya(i) = i * y / (size - 1)
+      i += 1
+    }
+    val f = Array.ofDim[Double](size)
+    new RungeKuttaODESolver().solve(odeFunction, ya, 0, f)
+    return (f(size - 1), odeFunction.value(y, f(size - 1)))
+  }
+
+  def priceAndreasenHugeZABR(isCall: Boolean, spec: ZABRModelSpec, forward: Double, tte: Double, withLaplaceCorrection: Boolean = true): CubicPP = {
+    val strikePriceVol = priceAndreasenHugeZABRStrikePriceVol(isCall, spec, forward, tte, withLaplaceCorrection)
+    return CubicSpline.makeBesselSpline(strikePriceVol._1, strikePriceVol._2)
+  }
+
+  def priceAndreasenHugeZABRStrikePriceVol(isCall: Boolean, spec: ZABRModelSpec, forward: Double, tte: Double, withLaplaceCorrection: Boolean = true): (Array[Double], Array[Double], Array[Double]) = {
+    val nu = spec.nu
+    val alpha = spec.alpha
+    val beta = spec.beta
+    val rho = spec.rho
+    val onebeta = 1 - beta
+    val gamma = spec.gamma
+    val z = 1.0
+    //later the forward vol is used to price with 1 step euler FD scheme.
+    //we could invert back this price to find real implied vol for comparison
+
+    val fsteps = AndreasenHugeSize
+    var fmin = 0.005
+    var fmax = 6 * (forward) + fmin;
+    //math.min(10*forward,computeFmax(spec, forward, tte))
+    var deltaf = (fmax - fmin) / fsteps
+    //val findex = ((forward-fmin)/deltaf).toInt
+    //deltaf = (forward-fmin)/findex
+
+
+    fmax = (fsteps) * deltaf
+    val mesh = new Mesh1D() {
+      private val x_ = Array.ofDim[Double](fsteps)
+      for (i <- 0 until fsteps) {
+        x_(i) = fmin + (i) * deltaf
+      }
+
+      def x = x_
+
+      def size = fsteps
+    } //new UniformMesh1D(fsteps, new Mesh1DBoundaries(fmin, fmax))
+    val rhs = Array.ofDim[Double](mesh.size)
+    val lhs = new TridiagonalMatrix(mesh.size)
+    val varianceVector = Array.ofDim[Double](mesh.size)
+    val sign = if (isCall) 1 else -1
+    val forwardonebeta = math.pow(forward, onebeta)
+
+    var x = Array.ofDim[Double](mesh.size)
+    for (i <- 0 until mesh.size) {
+      val k = mesh.x(i)
+      rhs(i) = math.max(sign * (forward - k), 0)
+      val y = Math.pow(z, gamma - 2) / (alpha * onebeta) * (forwardonebeta - math.pow(k, onebeta))
+      val fAndF = solveZABRODE(spec, y)
+      val fy = fAndF._1
+      val Fy = 1.0 / fAndF._2
+      //val jy = Math.sqrt((1 + nu * nu * y * y - 2 * rho * nu * y))
+      //println("k="+k+" Fy="+Fy+" jy="+jy)
+      val sigmak = alpha * math.pow(k, beta)
+      val forwardvol = Fy * z * sigmak
+      var thetak2 = forwardvol * forwardvol
+      x(i) = math.pow(z, 1 - gamma) * fy
+      //val directBlackVol = if (math.abs(forward-k)<1e-6) alpha*math.pow(forward, beta-1) else (Math.log(forward/k))/x(i)
+      //println("Direct "+gamma+" "+k+" "+directBlackVol)
+      if (withLaplaceCorrection) {
+        //1.0 / nu * math.log((jy - rho + nu * y) / (1 - rho))
+        val xsi = math.abs(x(i)) / math.sqrt(tte)
+        val factor = 2.0 * (1.0 - xsi * CumulativeNormalDistribution.value(-xsi) / NormalDistribution.value(xsi))
+        //        val normalVol = (forward - k) / x
+        //        val eps = 1e-7
+        //        val factorter = (BachelierVanillaEuropean.price(isCall, k, forward, normalVol, tte) - math.max(sign * (forward - k), 0)) / (BachelierVanillaEuropean.price(isCall, k, forward, normalVol, tte + eps) - BachelierVanillaEuropean.price(isCall, k, forward, normalVol, tte)) * eps / tte
+        //        if (math.abs(factorter - factor) > 1e-4) {
+        //          println("factor was " + factor + " but factorter was " + factorter)
+        //        }
+        thetak2 *= factor
+      }
+      varianceVector(i) = thetak2
+      lhs.middle(i) = 1.0
+    }
+    val diffCache = new DifferentialCache(mesh.x)
+    lhs.plusD2(1, lhs.size - 1, diffCache, varianceVector, -0.5 * tte)
+    //zero gamma boundary
+    //    lhs.upper(0) = 0.0
+    //    lhs.middle(0) = 1.0
+    //    lhs.lower(lhs.size - 1) = 0.0
+    //    lhs.middle(lhs.size - 1) = 1.0
+
+    //andreasen huge boundary
+    val normalImpliedVol0 = (forward - mesh.x(0)) / x(0);
+    rhs(0) = BachelierVanillaEuropean.price(isCall, mesh.x(0), forward, normalImpliedVol0, tte)
+    val normalImpliedVoln = (forward - mesh.x(lhs.size - 1)) / x(lhs.size - 1)
+    rhs(lhs.size - 1) = BachelierVanillaEuropean.price(isCall, mesh.x(lhs.size - 1), forward, normalImpliedVoln, tte)
+
+    //order 1 boundary
+    //    val    firstLine = new OperatorLine(0, 3)
+    //    ForwardPartialOrder2Parabolic1DBoundaryFactory.makeODELine(0, mesh.x, -0.5*varianceVector(0)*tte, 0, 1.0, firstLine)
+    //    val lastLine = new OperatorLine(lhs.size - 3,lhs.size)
+    //    BackwardPartialOrder2Parabolic1DBoundaryFactory.makeODELine(lhs.size - 1, mesh.x, -0.5*varianceVector(lhs.size-1)*tte, 0, 1.0, lastLine)
+    //    lhs.setBoundaries(firstLine, lastLine)
+
+    val price = Array.ofDim[Double](mesh.size)
+    val solver = new ThomasTridiagonalSolver()
+    solver.init(mesh.size)
+    solver.solve(lhs, rhs, price)
+
+    return (mesh.x, price, x)
   }
 
   def priceAndreasenHugeMulti(isCall: Boolean, spec: SABRModelSpec, forward: Double, tte: Double, timeSteps: Int): CubicPP = {
@@ -313,4 +457,71 @@ object SABRVanilla {
 
     return CubicSpline.makeBesselSpline(mesh.x, price)
   }
+}
+
+class DensityGaussianApproxPricer(spec: SABRModelSpec, forward: Double, tte: Double, steps: Int, Fmax: Double) {
+  private var Q: Array[Double] = null
+  private var F: Array[Double] = null
+  private var dx = 0.0
+  init()
+
+  def init() {
+    dx = (Fmax - spec.b) / steps
+    var sum = 0.0
+    var j = 0
+    val forwardonebeta = math.pow(forward, 1 - spec.beta)
+    F = Array.ofDim(steps)
+    Q = Array.ofDim(steps)
+    val C0 = math.pow(forward + spec.b, spec.beta)
+    while (j < steps) {
+      F(j) = spec.b + dx * (j + 0.5)
+      val f = math.abs(F(j) + spec.b) - spec.b
+      val C = math.pow(f + spec.b, spec.beta)
+      val fonebeta = math.pow(f, 1 - spec.beta)
+      val z = (fonebeta - forwardonebeta) / (spec.alpha * (1 - spec.beta))
+      val y = 1 / spec.nu * math.log((math.sqrt(1 + 2 * spec.rho * spec.nu * z + spec.nu * spec.nu * z * z) + spec.rho + spec.nu * z) / (1 + spec.rho))
+      // val gamma = if (math.abs(f - forward) < Epsilon.MACHINE_EPSILON_SQRT) spec.beta / forwardonebeta else (C - C0) / (f - forward)
+      // val expTerm = math.exp(spec.rho * spec.nu * spec.alpha * gamma * tte)
+      val expTerm = 1
+      val D = (1 + 2 * spec.rho * spec.nu * z + spec.nu * spec.nu * z * z) * expTerm * C * C
+      val dy = 1 / (spec.alpha * math.sqrt(D))
+      Q(j) = 1 / math.sqrt(2 * math.Pi * tte) * math.exp(-y * y / (2 * tte)) * dy
+      j += 1
+    }
+  }
+
+  def price(isCall: Boolean, strike: Double): Double = {
+    var j = 0
+    var price = 0.0
+    var Qsum = 0.0
+    var j0 = -1
+    if (isCall) {
+      while (j < F.length) {
+        if (F(j) > strike) {
+          price += (F(j) - strike) * Q(j) * dx
+          if (j0 < 0) j0 = j
+        }
+        Qsum += Q(j) * dx
+        j += 1
+      }
+      val term = 0.5 * dx
+      price += 0.5 * term * term * Q(j0)
+
+    } else {
+      while (j < F.length) {
+        if (F(j) < strike) {
+          price += (strike - F(j)) * Q(j) * dx
+        } else {
+          if (j0 < 0) j0 = j
+        }
+        Qsum += Q(j) * dx
+        j += 1
+      }
+      val term = 0.5 * dx
+      price += 0.5 * term * term * Q(j0)
+
+    }
+    return price
+  }
+
 }

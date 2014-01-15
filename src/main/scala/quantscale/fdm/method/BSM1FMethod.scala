@@ -1,4 +1,5 @@
 package quantscale.fdm.method
+
 import quantscale.fdm.BSM1FFDSpec
 import quantscale.fdm.TridiagonalSolver
 
@@ -7,5 +8,5 @@ abstract class BSM1FMethod {
 
   def solve(currentTime: Double, dt: Double, f: Array[Double]);
 
-  var solver : TridiagonalSolver = null;
+  var solver: TridiagonalSolver = null;
 }

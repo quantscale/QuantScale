@@ -1,4 +1,6 @@
-package quantscale.fdm.method;
+package quantscale.fdm.method
+
+;
 
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -14,18 +16,19 @@ class LRE3Parabolic1DMethod(payoff: FDPayoff) extends Parabolic1DMethod {
   final val logger = LoggerFactory.getLogger(getClass());
 
   private val thetaMethod = new ThetaParabolic1DMethod(ThetaParabolic1DMethod.THETA_IMPLICIT);
-  private var tridiagonalHalf,  tridiagonalThird: TridiagonalMatrix = null
-  private var f1, f2,  f2tmp,  f3tmp: State = null
+  private var tridiagonalHalf, tridiagonalThird: TridiagonalMatrix = null
+  private var f1, f2, f2tmp, f3tmp: State = null
 
   private var specialIndex: Int = 0;
+
   override def spec = thetaMethod.spec
 
   private var solverND: TridiagonalSolverND = null
 
-  def copy() : Parabolic1DMethod = {
+  def copy(): Parabolic1DMethod = {
     return new LRE3Parabolic1DMethod(payoff)
   }
-  
+
   override def initSystem(specV: Parabolic1DFDSpec) {
     thetaMethod.initSystem(specV)
     thetaMethod.solver = solver
@@ -59,10 +62,10 @@ class LRE3Parabolic1DMethod(payoff: FDPayoff) extends Parabolic1DMethod {
     while (i < m) {
       tridiagonalHalf.lower(i) = thetaMethod.tridiagonal.lower(i) / 2
       tridiagonalHalf.upper(i) = thetaMethod.tridiagonal.upper(i) / 2
-      tridiagonalHalf middle(i) = 1 + (thetaMethod.tridiagonal.middle(i) - 1) / 2
+      tridiagonalHalf middle (i) = 1 + (thetaMethod.tridiagonal.middle(i) - 1) / 2
       tridiagonalThird.lower(i) = thetaMethod.tridiagonal.lower(i) / 3
       tridiagonalThird.upper(i) = thetaMethod.tridiagonal.upper(i) / 3
-      tridiagonalThird middle(i) = 1 + (thetaMethod.tridiagonal.middle(i) - 1) / 3
+      tridiagonalThird middle (i) = 1 + (thetaMethod.tridiagonal.middle(i) - 1) / 3
       i += 1
     }
     thetaMethod.tridiagonal = tridiagonalHalf

@@ -1,4 +1,5 @@
 package quantscale.fdm.method
+
 import quantscale.fdm.BSM1FFDSpec
 import quantscale.fdm.TridiagonalMatrix
 
@@ -15,9 +16,9 @@ class TRBDF2CentralLogBSM1FMethod() extends BSM1FMethod {
   private var rhs: Array[Double] = null;
   private var spec: BSM1FFDSpec = null;
   private var fTr: Array[Double] = null;
-  private var x : Array[Double] = null;
+  private var x: Array[Double] = null;
   private var ex: Array[Double] = null;
-  
+
   override def initSystem(specV: BSM1FFDSpec) {
     spec = specV
     tridiagonal = new TridiagonalMatrix(spec.grid.spaceVector.size);

@@ -1,4 +1,5 @@
 package quantscale.fdm.method
+
 import quantscale.fdm.TridiagonalSolver
 import quantscale.fdm.Parabolic1DFDSpec
 import quantscale.fdm.State
@@ -7,25 +8,25 @@ import quantscale.fdm.State
  * PDE solver for dX = mu dt + sigma dW ( use mu*X  sigma*X for for lognormal)
  */
 abstract class Parabolic1DMethod {
-  
-  def spec : Parabolic1DFDSpec 
-  
+
+  def spec: Parabolic1DFDSpec
+
   def initSystem(specV: Parabolic1DFDSpec)
 
-  
+
   def solve(currentTime: Double, dt: Double, f: State)
 
-  var solver : TridiagonalSolver = null
-  
+  var solver: TridiagonalSolver = null
+
   var smearingReducer: VarianceFilter = new ScharfetterGummelVarianceFilter
 
-  var lowerBoundary : Parabolic1DBoundaryFactory = ForwardLinearOrder1Parabolic1DBoundaryFactory 
-  var upperBoundary : Parabolic1DBoundaryFactory = BackwardLinearOrder1Parabolic1DBoundaryFactory 
+  var lowerBoundary: Parabolic1DBoundaryFactory = ForwardLinearOrder1Parabolic1DBoundaryFactory
+  var upperBoundary: Parabolic1DBoundaryFactory = BackwardLinearOrder1Parabolic1DBoundaryFactory
 
-  def copy() : Parabolic1DMethod
-  
+  def copy(): Parabolic1DMethod
+
   def shutdown() {}
-  
+
   def computeDrift(x: Array[Double], t: Double, dt: Double, driftVector: Array[Double]) {
     if (!spec.bIsStateDependent) {
       val mu0 = spec.b(t, dt, 0)
@@ -38,7 +39,7 @@ abstract class Parabolic1DMethod {
       }
     }
   }
-  
+
   def computeDiscount(x: Array[Double], t: Double, dt: Double, discountVector: Array[Double]) {
     if (!spec.cIsStateDependent) {
       val mu0 = -spec.c(t, dt, 0)

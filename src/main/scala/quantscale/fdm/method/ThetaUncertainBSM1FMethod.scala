@@ -20,12 +20,13 @@ class ThetaUncertainBSM1FMethod(private var thetaV: Double = ThetaParabolic1DMet
   val maxNewtonIteration = 3
 
   private var dtFracV = 1.0;
-  
+
   override def spec = _spec
-  
-      def copy() : Parabolic1DMethod = {
+
+  def copy(): Parabolic1DMethod = {
     return new ThetaUncertainBSM1FMethod(thetaV)
   }
+
   override def initSystem(specV: Parabolic1DFDSpec) {
     _spec = specV.asInstanceOf[UncertainBSM1FFDSpec]
     tridiagonal = new TridiagonalMatrix(spec.grid.spaceVector.size);
@@ -35,11 +36,13 @@ class ThetaUncertainBSM1FMethod(private var thetaV: Double = ThetaParabolic1DMet
   }
 
   def theta = thetaV;
+
   def theta_=(v: Double) = {
     thetaV = v;
   }
 
   def dtFrac = dtFracV;
+
   def dtFrac_=(v: Double) = {
     dtFracV = v;
   }
@@ -58,7 +61,7 @@ class ThetaUncertainBSM1FMethod(private var thetaV: Double = ThetaParabolic1DMet
       if (isDriftSpaceDependent) mu = spec.b(t, dt, ex(j))
 
       val gamma =
-        //        (fNew(j + 1) - 2 * fNew(j) + fNew(j - 1)) / (dxj * dxjplus)
+      //        (fNew(j + 1) - 2 * fNew(j) + fNew(j - 1)) / (dxj * dxjplus)
         2 * (fNew(j + 1) - fNew(j)) / ((x(j + 1) - x(j - 1)) * Math.abs(dxjplus)) +
           2 * (fNew(j - 1) - fNew(j)) / ((x(j + 1) - x(j - 1)) * Math.abs(dxj));
 

@@ -15,10 +15,12 @@ class PredictorCorrectorParabolic1DMethod(val payoff: FDPayoff) extends Paraboli
 
   private var specialIndex: Int = 0;
 
-    def copy() : Parabolic1DMethod = {
+  def copy(): Parabolic1DMethod = {
     return new PredictorCorrectorParabolic1DMethod(payoff)
   }
+
   override def spec = thetaMethod.spec
+
   override def initSystem(specV: Parabolic1DFDSpec) {
     thetaMethod.initSystem(specV);
     thetaMethod.solver = solver;

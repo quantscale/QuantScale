@@ -1,4 +1,5 @@
 package quantscale.fdm.method
+
 import quantscale.fdm.BSM1FFDSpec
 import quantscale.fdm.TridiagonalMatrix
 import quantscale.fdm.payoff.FDPayoff
@@ -85,15 +86,15 @@ class TRBDF2CentralBSM1FMethod(payoff: FDPayoff) extends BSM1FMethod {
     solver.solve(tridiagonal, rhs, f);
 
     //TODO compute next dt. The f & q in bank are probably L & f. TODO verify
-//    val C = (-3 * alpha * alpha + 4 * alpha - 2) / (12 * (2 - alpha))
-//    val tau = new Array[Double](f.length)
-//    var i = 0
-//    while (i < tau.length) {
-//      tau(i) = 2 * C * dt * (fInitial(i) / alpha - fTr(i) / (alpha * (1 - alpha)) +
-//        f(i) / (1 - alpha))
-//      i += 1
-//    }
-    
+    //    val C = (-3 * alpha * alpha + 4 * alpha - 2) / (12 * (2 - alpha))
+    //    val tau = new Array[Double](f.length)
+    //    var i = 0
+    //    while (i < tau.length) {
+    //      tau(i) = 2 * C * dt * (fInitial(i) / alpha - fTr(i) / (alpha * (1 - alpha)) +
+    //        f(i) / (1 - alpha))
+    //      i += 1
+    //    }
+
   }
 
 }

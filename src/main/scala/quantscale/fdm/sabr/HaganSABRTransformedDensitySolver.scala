@@ -315,7 +315,11 @@ class HaganSABRTransformedDensitySolver(spec: SABRModelSpec, forward: Double, T:
         val ztilde = zmin_ + k * h
         val ftilde = computeFFromY(computeYFromZ(ztilde))
         val term = (ftilde - strike)
-        var price = 0.5 * term * term * P0_(k) + (Fmax - strike) * PR_
+        val dFdZ = if (math.abs(term) > 1e-5) (ftilde - Fm_(k)) / (h * 0.5) else 1
+
+        //val dFdZ =  if (math.abs( term) > 1e-5) (ftilde - strike)/(ztilde-zstrike) else 1
+        // val dFdZ = if (math.abs( term) > 1e-6) (Cm_(k)+Cm_(k-1))/2  else 1  //create discontinuity
+        var price = 0.5 * term * term * P0_(k) / dFdZ + (Fmax - strike) * PR_
         k += 1
         while (k < size - 1) {
           price += (Fm_(k) - strike) * h * P0_(k)
@@ -334,11 +338,14 @@ class HaganSABRTransformedDensitySolver(spec: SABRModelSpec, forward: Double, T:
         while (zstrike > zmin_ + (k) * h) {
           k += 1
         }
-        val ztilde = zmin_ + k * h
+        val ztilde = zmin_ + (k) * h
         val ftilde = computeFFromY(computeYFromZ(ztilde))
         val term = strike - ftilde
-        var price = 0.5 * term * term * P0_(k) + (strike - Fmin) * PL_
-        k -= 1
+        //  val dFdZ = if (math.abs(term) > 1e-6) (Cm_(k)+Cm_(k-1))/2 else 1   //create discontinuity
+        //val dFdZ = if (math.abs( term) > 1e-5) (ftilde - strike)/(ztilde-zstrike) else 1
+
+        val dFdZ = if (math.abs(term) > 1e-5) (ftilde - Fm_(k)) / (0.5 * h) else 1
+        var price = 0.5 * term * term * P0_(k) / dFdZ + (strike - Fmin) * PL_
         while (k > 0) {
           price += (strike - Fm_(k)) * h * P0_(k)
           k -= 1
@@ -379,6 +386,7 @@ class HaganSABRTransformedDensitySolver(spec: SABRModelSpec, forward: Double, T:
       tri1.middle(j) = 1 + b * frac * M1(j)
       tri1.upper(j) = -c * frac * M1(j + 1)
       if (M0 != null) {
+        //-(lower+middle-1+upper)/dt*2
         tri0.lower(j) = a * frac * M0(j - 1)
         tri0.middle(j) = 1 - b * frac * M0(j)
         tri0.upper(j) = c * frac * M0(j + 1)

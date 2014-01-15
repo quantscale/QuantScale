@@ -30,17 +30,25 @@ object MonotoneHyman83DerivativeFilter extends DerivativeFilter {
   def filter(x: Array[Double], y: Array[Double], yPrime: Array[Double]) = {
     val n = y.length - 1
     var i = 1
-    yPrime(0) = if (x(0) >= 0) math.min(math.max(0, yPrime(0)), 3 * math.abs(x(0)))
-    else math.max(math.min(0, yPrime(0)), -3 * math.abs(x(0)))
+    val dx0 = x(1) - x(0)
+    val S0 = (y(1) - y(0)) / dx0
+    yPrime(0) = if (S0 >= 0) math.min(math.max(0, yPrime(0)), 3 * math.abs(S0))
+    else math.max(math.min(0, yPrime(0)), -3 * math.abs(S0))
 
     while (i < n) {
-      val sig = if (x(i) * x(i - 1) > 0) x(i) else yPrime(i)
-      yPrime(i) = if (sig >= 0) math.min(math.max(0, yPrime(i)), 3 * math.min(math.abs(x(i)), math.abs(x(i - 1))))
-      else math.max(math.min(0, yPrime(i)), -3 * math.min(math.abs(x(i)), math.abs(x(i - 1))));
+      val dxi = x(i + 1) - x(i)
+      val Si = (y(i + 1) - y(i)) / dxi
+      val dxim = x(i) - x(i - 1)
+      val Sim = (y(i) - y(i - 1)) / dxim
+      val sig = if (Si * Sim > 0) Si else yPrime(i)
+      yPrime(i) = if (sig >= 0) math.min(math.max(0, yPrime(i)), 3 * math.min(math.abs(Si), math.abs(Sim)))
+      else math.max(math.min(0, yPrime(i)), -3 * math.min(math.abs(Si), math.abs(Sim)));
       i += 1
     }
-    yPrime(n) = if (x(n - 1) >= 0) math.min(math.max(0, yPrime(n)), 3 * math.abs(x(n - 1)));
-    else math.max(math.min(0, yPrime(n)), -3 * math.abs(x(n - 1)));
+    val dxnm1 = x(n) - x(n - 1)
+    val Snm1 = (y(n) - y(n - 1)) / dxnm1
+    yPrime(n) = if (Snm1 >= 0) math.min(math.max(0, yPrime(n)), 3 * math.abs(Snm1));
+    else math.max(math.min(0, yPrime(n)), -3 * math.abs(Snm1));
   }
 }
 
@@ -71,27 +79,36 @@ object MonotoneHyman89DerivativeFilter extends DerivativeFilter {
     var pu = 0.0
     var pd = 0.0
     var M = 0.0
-    var correction = if ((tmp(0) * x(0)) > 0) math.signum(tmp(0)) * math.min(Math.abs(tmp(0)), math.abs(3.0 * x(0))) else 0.0
+    val dx0 = x(1) - x(0)
+    val S0 = (y(1) - y(0)) / dx0
+    var correction = if ((tmp(0) * S0) > 0) math.signum(tmp(0)) * math.min(Math.abs(tmp(0)), math.abs(3.0 * S0)) else 0.0
     if (correction != tmp(0)) {
       tmp(0) = correction
     }
     var i = 1
     while (i < (n - 1)) {
       val dxi = x(i + 1) - x(i)
-      pm = (x(i - 1) * dxi + x(i) * (x(i) - x(i - 1))) / (x(i + 1) - x(i - 1))
-      M = 3.0 * math.min(math.min(math.abs(x(i)), math.abs(x(i - 1))), math.abs(pm))
+      val Si = (y(i + 1) - y(i)) / dxi
+      val dxim = x(i) - x(i - 1)
+      val Sim = (y(i) - y(i - 1)) / dxim
+      pm = (Sim * dxi + Si * dxim) / (dxim + dxi)
+      M = 3.0 * math.min(math.min(math.abs(Si), math.abs(Sim)), math.abs(pm))
       if (i > 1) {
-        if (((x(i - 1) - x(i - 2)) * (x(i) - x(i - 1))) > 0.0) {
-          pd = ((x(i - 1) * ((2.0 * (x(i) - x(i - 1)) + x(i - 1) - x(i - 2))) - (x(i - 2) * (x(i) - x(i - 1))))) / (x(i) - x(i - 2))
-          if (((pm * pd) > 0.0) && ((pm * (x(i - 1) - x(i - 2))) > 0.0)) {
+        val dxim2 = x(i - 1) - x(i - 2)
+        val Sim2 = (y(i - 1) - y(i - 2)) / dxim2
+        if (((Sim - Sim2) * (Si - Sim)) > 0.0) {
+          pd = (Sim * (2.0 * dxim + dxim2) - Sim2 * dxim) / (dxim + dxim2)
+          if (((pm * pd) > 0.0) && ((pm * (Sim - Sim2)) > 0.0)) {
             M = math.max(M, 1.5 * math.min(math.abs(pm), math.abs(pd)))
           }
         }
       }
       if (i < (n - 2)) {
-        if (((x(i) - x(i - 1)) * (x(i + 1) - x(i))) > 0.0) {
-          pu = ((x(i) * ((2.0 * dxi) + x(i + 1) - x(i))) - (x(i + 1) * dxi)) / (x(i + 2) - x(i));
-          if (((pm * pu) > 0.0) && ((-pm * (x(i) - x(i - 1))) > 0.0)) {
+        val dxip = x(i + 2) - x(i + 1)
+        val Sip = (y(i + 2) - y(i + 1)) / dxip
+        if (((Si - Sim) * (Sip - Si)) > 0.0) {
+          pu = (Si * (2.0 * dxi + dxip) - Sip * dxi) / (dxi + dxip)
+          if (((pm * pu) > 0.0) && ((-pm * (Si - Sim)) > 0.0)) {
             M = math.max(M, 1.5 * math.min(math.abs(pm), math.abs(pu)))
           }
         }
@@ -103,8 +120,9 @@ object MonotoneHyman89DerivativeFilter extends DerivativeFilter {
       }
       i += 1
     }
-    if ((tmp(n - 1) * x(n - 2)) > 0) {
-      correction = math.signum(tmp(n - 1)) * math.min(math.abs(tmp(n - 1)), math.abs(3.0 * x(n - 2)));
+    val Snm2 = (y(n - 1) - y(n - 2)) / (x(n - 1) - x(n - 2))
+    if ((tmp(n - 1) * Snm2) > 0) {
+      correction = math.signum(tmp(n - 1)) * math.min(math.abs(tmp(n - 1)), math.abs(3.0 * Snm2))
     } else {
       correction = 0.0
     }
@@ -347,6 +365,27 @@ object CubicSpline {
     computeParabolicFirstDerivative(x, y, b)
     return makeHermiteSpline(x, y, b)
   }
+
+  def makeHarmonicSpline(x: Array[Double], y: Array[Double]): CubicPP = {
+    val b = new Array[Double](x.length)
+    computeHarmonicFirstDerivativePCHIM(x, y, b)
+    return makeHermiteSpline(x, y, b)
+  }
+
+  def makeHymanCubicSpline(x: Array[Double], y: Array[Double]): CubicPP = {
+    val b = new Array[Double](x.length)
+    computeC2FirstDerivative(x, y, b)
+    MonotoneHyman83DerivativeFilter.filter(x, y, b)
+    return makeHermiteSpline(x, y, b)
+  }
+
+  def makeHymanBesselSpline(x: Array[Double], y: Array[Double]): CubicPP = {
+    val b = new Array[Double](x.length)
+    computeParabolicFirstDerivative(x, y, b)
+    MonotoneHyman83DerivativeFilter.filter(x, y, b)
+    return makeHermiteSpline(x, y, b)
+  }
+
 
   /**
    * Solve M . output = d where M is a tridiagonal matrix. Solving will modify

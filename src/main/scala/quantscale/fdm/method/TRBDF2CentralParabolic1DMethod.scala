@@ -1,4 +1,5 @@
 package quantscale.fdm.method
+
 import quantscale.fdm.TridiagonalMatrix
 import quantscale.fdm.payoff.FDPayoff
 import quantscale.fdm.ConstantLogBSM1FFDSpec

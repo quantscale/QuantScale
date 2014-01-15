@@ -29,6 +29,7 @@ object ForwardPartialOrder2Parabolic1DBoundaryFactory extends Parabolic1DBoundar
       .plusD1Forward2(i, x, b * multiplier)
       .plus(i, 1.0 + multiplier * c)
   }
+
   def makeODELine(i: Int, x: Array[Double], a: Double, b: Double, c: Double, line: OperatorLine) {
     line.fill(0.0)
     line.plusD2Forward(i, x, a)
@@ -43,6 +44,7 @@ object BackwardLinearOrder1Parabolic1DBoundaryFactory extends Parabolic1DBoundar
     line.fill(0.0)
     line.plusD1Backward(i, x, b * multiplier).plus(i, 1.0 + multiplier * c)
   }
+
   def makeODELine(i: Int, x: Array[Double], a: Double, b: Double, c: Double, line: OperatorLine) {
     line.fill(0.0)
     line.plusD1Backward(i, x, b).plus(i, c)
@@ -57,6 +59,7 @@ object BackwardPartialOrder2Parabolic1DBoundaryFactory extends Parabolic1DBounda
       .plusD1Backward2(i, x, b * multiplier)
       .plus(i, 1.0 + multiplier * c)
   }
+
   def makeODELine(i: Int, x: Array[Double], a: Double, b: Double, c: Double, line: OperatorLine) {
     line.fill(0.0)
     line.plusD2Backward(i, x, a)

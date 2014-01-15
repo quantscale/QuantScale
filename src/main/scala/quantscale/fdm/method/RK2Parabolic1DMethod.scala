@@ -16,11 +16,11 @@ class RK2Parabolic1DMethod(val payoff: FDPayoff) extends Parabolic1DMethod {
   private var specialIndex: Int = 0;
 
   override def spec = thetaMethod.spec
-  
-        def copy() : Parabolic1DMethod = {
+
+  def copy(): Parabolic1DMethod = {
     return new RK2Parabolic1DMethod(payoff)
   }
-  
+
   override def initSystem(specV: Parabolic1DFDSpec) {
     thetaMethod.initSystem(specV);
     thetaMethod.solver = solver;
@@ -38,7 +38,7 @@ class RK2Parabolic1DMethod(val payoff: FDPayoff) extends Parabolic1DMethod {
     thetaMethod.initLeftHandSide(currentTime, dt)
     thetaMethod.initRightHandSide(f)
     thetaMethod.initBoundaries(currentTime, dt, f)
-   
+
     val m = thetaMethod.tridiagonal.size
     var i = 0
     while (i < m) {
@@ -47,7 +47,7 @@ class RK2Parabolic1DMethod(val payoff: FDPayoff) extends Parabolic1DMethod {
       tridiagonalHalf.middle(i) = 1 + (thetaMethod.tridiagonal.middle(i) - 1) * 0.5
       i += 1
     }
-    
+
     val tridiagonal = thetaMethod.tridiagonal
     thetaMethod.tridiagonal = tridiagonalHalf
     thetaMethod.initRightHandSide(f)
@@ -56,11 +56,11 @@ class RK2Parabolic1DMethod(val payoff: FDPayoff) extends Parabolic1DMethod {
     for (d <- 0 until f.stateDimensions) {
       tridiagonalHalf.multiply(thetaMethod.rhs.values(d), fTemp.values(d))
     }
-    
-//    while (i < m) {
-//      tridiagonal.middle(i) = tridiagonal.middle(i) - 1
-//      i += 1
-//    }
+
+    //    while (i < m) {
+    //      tridiagonal.middle(i) = tridiagonal.middle(i) - 1
+    //      i += 1
+    //    }
     thetaMethod.tridiagonal = tridiagonal
     thetaMethod.initBoundaries(currentTime, dt, fTemp)
     if (payoff != null) payoff.setTime(currentTime);
@@ -71,7 +71,7 @@ class RK2Parabolic1DMethod(val payoff: FDPayoff) extends Parabolic1DMethod {
       tridiagonal.multiply(fTempValues, fFullValues)
       i = 0
       while (i < m) {
-        fValues(i) = fValues(i)-fTempValues(i) + fFullValues(i)
+        fValues(i) = fValues(i) - fTempValues(i) + fFullValues(i)
         i += 1
       }
     }

@@ -6,7 +6,7 @@ import quantscale.fdm.TridiagonalMatrix
 class HaganRichardsonEulerNSABRTransformedDensitySolver(spec: SABRModelSpec, forward: Double, T: Double, size: Int = 100, timeSteps: Int = 10, nDeviations: Double = 3.0)
   extends HaganSABRTransformedDensitySolver(spec, forward, T, size, timeSteps, nDeviations) {
 
-  var order = 5
+  var order = 3
   private var EmCache: Array[Array[Double]] = null
 
   override def solve() {

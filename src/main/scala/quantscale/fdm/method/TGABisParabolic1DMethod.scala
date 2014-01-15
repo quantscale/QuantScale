@@ -1,4 +1,6 @@
-package quantscale.fdm.method;
+package quantscale.fdm.method
+
+;
 
 import org.slf4j.LoggerFactory
 import quantscale.fdm.TridiagonalMatrix
@@ -102,8 +104,8 @@ class TGABisParabolic1DMethod(payoff: FDPayoff, private var _a: Double = 0.54) e
       val rhs1Values = rhs1.values(d)
       val rhs2Values = rhs2.values(d)
       val fValues = f.values(d)
-      System.arraycopy(fValues,0,rhs1Values,0,x.length)
-     System.arraycopy(fValues,0,rhs2Values,0,x.length)
+      System.arraycopy(fValues, 0, rhs1Values, 0, x.length)
+      System.arraycopy(fValues, 0, rhs2Values, 0, x.length)
 
     }
   }

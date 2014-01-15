@@ -1,4 +1,5 @@
 package quantscale.fdm.method
+
 import quantscale.fdm.TridiagonalMatrix
 import quantscale.fdm.payoff.FDPayoff
 import quantscale.fdm.ConstantLogBSM1FFDSpec
@@ -36,6 +37,7 @@ class TGASerialParabolic1DMethod(payoff: FDPayoff = null, private var _a: Double
   def copy(): Parabolic1DMethod = {
     return new TGASerialParabolic1DMethod(payoff)
   }
+
   override def initSystem(specV: Parabolic1DFDSpec) {
     _spec = specV
     tridiagonal = new TridiagonalMatrix(spec.grid.spaceVector.size);
