@@ -6,6 +6,10 @@ class Cashflow(var amount: Double, var fixingTime: Double, var paymentTime: Doub
 
 }
 
+trait AdjointMCPayoff extends MCPayoff {
+  def evalAdjoint(quotes: Array[Double], quotes_b:Array[Double])
+
+}
 trait MCPayoff {
   //implementation should reuse the payments to avoid reconstructing the object in the monte carlo loop
   def eval(quotes: Array[Double])

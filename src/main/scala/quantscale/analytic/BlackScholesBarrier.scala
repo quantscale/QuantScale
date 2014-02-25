@@ -225,6 +225,7 @@ object BlackScholesMertonBarrier {
     return bs0 - bsH - (barrier - strike) * discountDf * ndsh -
       math.pow(barrier / spot, -1.0 - 2 * math.log(driftDf) / variance) * (bs1 - bs2 - (barrier - strike) * discountDf * ndhs)
   }
+
   def priceUpAndOut(isCall: Boolean, strike: Double, barrier: Double, spot: Double, variance: Double, driftDf: Double, discountDf: Double, driftDfDelivery: Double, discountDfDelivery: Double): Double = {
     val sqrtVar = math.sqrt(variance)
     val x = (math.log(spot / strike / driftDf) + variance * 0.5) / sqrtVar
@@ -249,6 +250,94 @@ object BlackScholesMertonBarrier {
     else strike * (nxd - math.pow(barrier / spot, 2 * lambda - 2) * (nyd)) -
       spot * driftDfDelivery * (nx - math.pow(barrier / spot, 2 * lambda) * ny)
     return discountDfDelivery * undiscPrice
+  }
+
+  def priceUpAndOutAdjoint(isCall: Boolean, strike: Double, barrier: Double, spot: Double, tte: Double, vol: Double, growthRate: Double, discountRate: Double): Array[Double] = {
+    val vm0 = spot
+    val vm1 = vol
+    val vm2 = growthRate
+    val vm3 = discountRate
+    val vm4 = tte
+
+    val logstrike = math.log(strike)
+    val logbarrier = math.log(barrier)
+    val sign = if (isCall) 1 else -1
+    //spot, vol, r,t
+    val v1 = vm2*vm4   //logdriftCf
+    val v2 = vm1*vm1*vm4 //variance
+    val v3 = math.sqrt(v2) //sqrtVar
+    val v4 = math.log(vm0)
+    val v5 = v4 - logstrike + v1 + 0.5*v2
+    val v6 = v5/v3 // x
+    val v7 = v4 - logbarrier + v1 + 0.5*v2
+    val v8 = v7/v3  //x1
+    val v9 = 2*logbarrier - v4 - logstrike +v1 + 0.5 * v2
+    val v10 = v9/v3 //y
+    val v11 =logbarrier - v4 + v1 + 0.5*v2
+    val v12 = v11/v3 //y1
+    val v13 = -0.5 + v1/v2 //lambda
+
+    val v14 = CumulativeNormalDistribution.value(sign * v6) //nx
+    val v15 = CumulativeNormalDistribution.value(sign * (v6 - v3)) // nxd
+    val v16 = CumulativeNormalDistribution.value(v8) //nx1 =
+    val v17 = CumulativeNormalDistribution.value(v8 - v3) // nx1d =
+    val v18 = CumulativeNormalDistribution.value(-v10) //ny =
+    val v19 = CumulativeNormalDistribution.value(-v12)  //ny1
+    val v20 = CumulativeNormalDistribution.value(-v10 + v3)  //nyd
+    val v21 = CumulativeNormalDistribution.value(-v12 + v3) // ny1d
+
+
+    val v22 = math.exp(v1)  //CF
+    val v23 = math.exp(-vm3*vm4) //DF
+    val v231 = math.pow(barrier / vm0, 2 * v13 - 2)
+    val v232 = math.pow(barrier / vm0, 2 * v13)
+    val v24 = if (isCall) vm0 * v22 * (v14 - v16 + v232 * (v18 - v19)) -
+         strike * (v15 - v17 + v231 * (v20 - v21))
+     else strike * (v15 - v231 * (v20)) -
+      vm0 * v22 * (v14 - v232 * v18)
+    val v25 = v23 * v24
+
+    val v25b = 1.0
+    val v24b = v25b * v23
+    val v23b = v25b * v24
+    val v22b = if (isCall) v24b*vm0*(v14 - v16 + v232 * (v18 - v19))
+               else -v24b*vm0*(v14 - v232 * v18)
+    val v231b = if (isCall) -v24b*strike*(v20-v21)
+                else -v24b*strike*v20
+    val v232b = if (isCall) v24b*vm0*v22*(v18 - v19) else v24b*vm0*v22*v18
+    val v21b = if (isCall) v24b*strike*v231 else 0
+    val v20b = -v24b*strike*v231
+    val v19b = if (isCall) -v24b*vm0*v22*v232 else 0
+    val v18b = v24b*vm0*v22*v232
+    val v17b = if (isCall) -v24b*strike else 0
+    val v16b = if (isCall) v24b*vm0*v22 else 0
+    val v15b = if (isCall) -strike*v24b else v24b*strike
+    val v14b = if (isCall) v24b*vm0*v22 else -v24b*vm0*v22
+    var v13b = 2*v231b* v231* math.log(barrier / vm0)//derivative of u^x = ?
+        v13b += 2*v232b*v232* math.log(barrier / vm0)
+    val v12b =  -v19b* NormalDistribution.value(-v12)       -v21b* NormalDistribution.value(-v12+v3)
+    val v11b = v12b/v3
+    val v10b = -v18b*NormalDistribution.value(-v10) - v20b*NormalDistribution.value(-v10 + v3)
+    val v9b = v10b/v3
+    val v8b = v16b*NormalDistribution.value(v8)+v17b*NormalDistribution.value(v8-v3)
+    val v7b = v8b/v3
+    val v6b = sign*v14b*NormalDistribution.value(sign * v6)+sign*v15b*NormalDistribution.value(sign * (v6-v3))
+    val v5b = v6b/v3
+    val v4b = -v11b - v9b +v5b+v7b
+    val v3b = v21b* NormalDistribution.value(-v12 + v3) +
+      v20b*NormalDistribution.value(-v10 + v3) - v17b*NormalDistribution.value(v8 - v3)- sign*v15b * CumulativeNormalDistribution.value(sign * (v6 - v3)) -
+      v12b*v11/v3/v3 - v10b*v9/v3/v3 - v8b*v7/v3/v3 - v6b*v5/v3/v3
+    val v2b = v11b*0.5 -v13b/v2/v2 + v9b*0.5 +v7b*0.5+v5b*0.5+0.5*v3b/v3
+    val v1b = v22b*v22+ v11b + v9b+ v7b + v5b
+
+    val vm0b = v4b/vm0 + v231b * (-2*v13-2)*v231/vm0 - v232b*2*v13/vm0 + v24b* (if (isCall) v22 * (v14 - v16 + v232 * (v18 - v19)) else   - v22 * (v14 - v232 * v18))
+    val vm1b = v2b*2*vm1*vm4
+    val vm2b = v1b*vm4
+    val vm3b = -vm4*v23b*v23
+    val vm4b = v1b*v2+v2b*vm1*vm1-v23b*vm3*v23
+
+
+    return Array(v25, vm0b, vm1b, vm2b, vm3b, vm4b)
   }
 
   def priceAccumulator(buySell: Int, isKoAfterAccrual: Boolean,

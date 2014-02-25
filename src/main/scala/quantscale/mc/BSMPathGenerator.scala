@@ -120,7 +120,7 @@ class BSM2FMartingaleQuotePower(maxPower: Int) extends BSMPathListener {
 
 class BSMPathGenerator(spec: BSMMCSpec, rngFactory: RandomSequenceFactory, brownianTransformFactory: BrownianTransformFactory) extends PathGenerator {
   private var _rng: RandomSequenceGenerator = null
-  private var _path: MCPath = null
+  private var _path: AdjointMCPath = null
   private var _z: Array[Double] = null
   private var _zTransformed: Array[Array[Double]] = null
   private var _dimension = spec.assets.length
@@ -133,12 +133,14 @@ class BSMPathGenerator(spec: BSMMCSpec, rngFactory: RandomSequenceFactory, brown
 
   var pathListener: BSMPathListener = null
 
+  def assetDimension() = spec.assets.size
+
   def init(evaluationTimes: Array[Double]) {
     val assets = spec.assets
     _timeDimension = evaluationTimes.length
     _rng = rngFactory.makeRandomSequenceGenerator(_timeDimension * _dimension)
 
-    _path = new MCPath(evaluationTimes, _dimension)
+    _path = new AdjointMCPath(evaluationTimes, _dimension)
     _z = Array.ofDim[Double](_rng.dimension)
     _zTransformed = Array.ofDim[Double](_timeDimension, _dimension)
 
@@ -195,6 +197,54 @@ class BSMPathGenerator(spec: BSMMCSpec, rngFactory: RandomSequenceFactory, brown
     }
   }
 
+  def nextAdjointPath(): AdjointMCPath = {
+    _rng.nextSequence(_z)
+    var i = 0
+    while (i < _z.length) {
+      _z(i) = AS241InvCND.value(_z(i))
+      i += 1
+    }
+    //BB / PCA
+    if (_brownianTransform == null) {
+      i = 0
+      while (i < _timeDimension) {
+        System.arraycopy(_z, i * _dimension, _zTransformed(i), 0, _dimension)
+        i += 1
+      }
+    } else {
+      _brownianTransform.transform(_z, _dimension, _zTransformed)
+    }
+
+    // X = ln S, dX = (drift - .5*sig^2) dt + sig dW
+    //create adjoint method, dX/dS = 1/exp(x0), later dX/dvoli
+    var previousPath = _x0
+    i = 0
+    if (pathListener != null) pathListener.startPath(_x0)
+    while (i < _timeDimension) {
+      val a = _a(i)
+      val sqrt = _sqrtCovariance(i)
+      val zi = _zTransformed(i)
+      var j = 0
+      while (j < _dimension) {
+        var k = 0
+        var b = 0.0
+        while (k < _dimension) {
+          b += sqrt.getEntry(j, k) * zi(k);
+          k += 1
+        }
+        _path.values(i)(j) = previousPath(j) + a(j) + b
+        _path.delta(i)(j) = 1.0/spec.assets(i).initialPrice //FIXME do at init
+        //_path.vega(i)(j) need to track sqrtCovariance sigma dependence
+        if (pathListener != null) {
+          pathListener.nextStep(i, j, b)
+        }
+        j += 1
+      }
+      previousPath = _path.values(i)
+      i += 1
+    }
+    return _path
+  }
   def nextPath(): MCPath = {
     _rng.nextSequence(_z)
     var i = 0
@@ -214,6 +264,7 @@ class BSMPathGenerator(spec: BSMMCSpec, rngFactory: RandomSequenceFactory, brown
     }
 
     // X = ln S, dX = (drift - .5*sig^2) dt + sig dW
+    //create adjoint method, dX/dS = 1/exp(x0), later dX/dvoli
     var previousPath = _x0
     i = 0
     if (pathListener != null) pathListener.startPath(_x0)

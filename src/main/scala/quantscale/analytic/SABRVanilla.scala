@@ -32,7 +32,7 @@ class ZABRModelSpec(val alpha: Double, val beta: Double, val nu: Double, val rho
 }
 
 object SABRVanilla {
-  private val AndreasenHugeSize = 1950
+  private val AndreasenHugeSize = 195000
 
   def priceBenhamou(spec: SABRModelSpec, isCall: Boolean, strike: Double, forward: Double, tte: Double): Double = {
     val k = strike
@@ -202,7 +202,7 @@ object SABRVanilla {
 
     val fsteps = AndreasenHugeSize
     val fmin = 0
-    var fmax = 10 * forward //math.min(10*forward,computeFmax(spec, forward, tte))
+    var fmax = 1000 * forward //math.min(10*forward,computeFmax(spec, forward, tte))
     var deltaf = (fmax - fmin) / fsteps
     val findex = ((forward - fmin) / deltaf).toInt
     deltaf = (forward - fmin) / findex
@@ -261,7 +261,7 @@ object SABRVanilla {
     val solver = new ThomasTridiagonalSolver()
     solver.init(mesh.size)
     solver.solve(lhs, rhs, price)
-    return CubicSpline.makeBesselSpline(mesh.x, price)
+    return CubicSpline.makeCubicSpline(mesh.x, price)
   }
 
 

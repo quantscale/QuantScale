@@ -1,0 +1,11 @@
+
+module mypol 1.0;
+
+require {
+	type NetworkManager_t;
+	type etc_t;
+	class file unlink;
+}
+
+#============= NetworkManager_t ==============
+allow NetworkManager_t etc_t:file unlink;

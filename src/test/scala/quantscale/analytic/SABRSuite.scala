@@ -681,12 +681,12 @@ class SABRSuite extends FunSuite {
 
   }
 
-  @Test def testAlan() {
+  test("Alan") {
     val forward = 1.0
-    val K = 0.8
+    val K = 0.8//0.8
     val tte = 10.0
     val nu = 1.00
-    val beta = 0.30
+    val beta = 0.3//0.30
     val alpha = 1.00
     val rho = 0.90
     val df = 1.0
@@ -699,25 +699,27 @@ class SABRSuite extends FunSuite {
     val pde =
     //      new HaganTruncatedSABRDensitySolver(spec, forward, tte, 10000, 1000)
       new HaganLMG3SABRDensitySolver(spec, forward, tte, 10000, 10, 1000.0)
-    val pdeTransformed = new HaganSABRTransformedDensitySolver(spec, forward, tte, 1000, 100, 3)
+    val pdeTransformed = new HaganSABRTransformedDensitySolver(spec, forward, tte, 1000, 100, 4)
     pdeTransformed.smoothing = new RannacherSmoothing()
-    val volHagan = 100 * SABRVanilla.impliedVolatilityHagan(spec, forward, K, tte)
-    val volAHShort = 100 * SABRVanilla.impliedVolatilityAndreasenHuge(spec, forward, K, tte)
+    val volHagan =  SABRVanilla.impliedVolatilityHagan(spec, forward, K, tte)
+    val volAHShort =  SABRVanilla.impliedVolatilityAndreasenHuge(spec, forward, K, tte)
     val priceAH = splinePut.value(K)
     val priceAHRaw = splinePutRaw.value(K)
     val pricePDE = pde.price(false, K)
     val pricePDET = pdeTransformed.price(false, K)
     val normalVol = SABRVanilla.normalVolatilityHagan2013(spec, forward, K, tte)
-    val normalPrice = BachelierVanillaEuropean.price(true, K, forward, normalVol, tte)
+    val normalPrice = BachelierVanillaEuropean.price(false, K, forward, normalVol, tte)
     //    val volNormal = 100*solver.impliedVolatility(true, K, normalPrice, forward, df, tte)
-    val volAH = 100 * solver.impliedVolatility(false, K, priceAH, forward, df, tte)
-    val volAHRaw = 100 * solver.impliedVolatility(false, K, priceAHRaw, forward, df, tte)
-    val volPDE = 100 * solver.impliedVolatility(false, K, pricePDE, forward, df, tte)
-    val volPDET = 100 * solver.impliedVolatility(false, K, pricePDET, forward, df, tte)
-    val priceBen = SABRVanilla.priceBenhamou(spec, true, K, forward, tte) + K - forward
-    println("BS   " + BlackScholesVanillaEuropean.priceEuropeanVanilla(true, K, forward, volHagan * volHagan * tte, 1.0, df))
-    println("PDE  " + pricePDE)
-    println("PDET " + pricePDET)
+    val volAH =  solver.impliedVolatility(false, K, priceAH, forward, df, tte)
+    val volAHRaw =  solver.impliedVolatility(false, K, priceAHRaw, forward, df, tte)
+    val volPDE =  solver.impliedVolatility(false, K, pricePDE, forward, df, tte)
+    val volPDET =  solver.impliedVolatility(false, K, pricePDET, forward, df, tte)
+    val priceBen = SABRVanilla.priceBenhamou(spec, false, K, forward, tte) + K - forward
+    println("BS      " + BlackScholesVanillaEuropean.priceEuropeanVanilla(false, K, forward, volHagan * volHagan * tte, 1.0, df))
+    println("AHShort " + BlackScholesVanillaEuropean.priceEuropeanVanilla(false, K, forward, volAHShort * volAHShort * tte, 1.0, df))
+    println("AH      "+priceAH)
+    println("PDE     " + pricePDE)
+    println("PDET    " + pricePDET)
     println(priceBen)
     println(normalPrice)
     val volBen = Double.NaN //100* solver.impliedVolatility(false, K, priceBen, forward, df, tte)

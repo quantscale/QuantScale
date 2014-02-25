@@ -6,8 +6,20 @@ import quantscale.math.AS241InvCND
 case class Price() extends BSMMeasure(Double.NaN)
 case class DeltaGreek() extends BSMMeasure(Double.NaN)
 case class GammaGreek() extends BSMMeasure(Double.NaN)
+case class VegaGreek() extends BSMMeasure(Double.NaN)
+case class ThetaGreek() extends BSMMeasure(Double.NaN)
+case class RhoGreek() extends BSMMeasure(Double.NaN)
+case class Rho2Greek() extends BSMMeasure(Double.NaN)
 
 class BSMMeasure(var value: Double = Double.NaN) {
+}
+
+class DiscountFactor(val rate: Double, val time: Double) {
+  def value = math.exp(-rate*time)
+}
+
+class Variance(val vol : Double, val time: Double) {
+  def value = vol*vol*time
 }
 
 object BlackScholesVanillaEuropean {
@@ -39,6 +51,70 @@ object BlackScholesVanillaEuropean {
     return price;
   }
 
+  def priceEuropeanVanillaAdjoint(isCall: Boolean,
+                                  strike: Double,
+                                  spot: Double,
+                                  variance: Variance,
+                                  driftDf: DiscountFactor,
+                                  discountDf: DiscountFactor,
+                                  measures: Array[BSMMeasure]
+                                   ) {
+
+    val vm0 = spot
+    val vm1 = variance.vol
+    val vm2 = variance.time
+    val vm3 = driftDf.rate
+    val vm4 = driftDf.time
+    val vm5 = discountDf.rate
+    val vm6 = discountDf.time
+
+    val sign = if (isCall) 1 else -1
+    val sqrtvm2 = math.sqrt(vm2)
+    val sqrtVar = vm1*sqrtvm2
+    val cf = math.exp(vm3*vm4)
+    val forward = vm0 * cf
+    val log = math.log(forward / strike)
+    val d1 = 1.0 / sqrtVar * log + 0.5 * sqrtVar
+    val d2 = d1 - sqrtVar
+    val cnd1 = CumulativeNormalDistribution.value(sign * d1)
+    val cnd2 = CumulativeNormalDistribution.value(sign * d2)
+    val discountFactor = math.exp(-vm5*vm6)
+    val price = sign * discountFactor * (forward * cnd1 - strike * cnd2)
+
+    val priceBar = 1.0
+    val discountBar = priceBar*sign*(forward * cnd1 - strike * cnd2)
+    val vm5Bar = -discountBar*vm6*discountFactor
+    val vm6Bar = -discountBar*vm5*discountFactor
+    val cnd1Bar = priceBar*sign*discountFactor*forward
+    val cnd2Bar = -priceBar*sign*discountFactor*strike
+    val d2Bar = cnd2Bar * sign * NormalDistribution.value(sign*d2)
+    val d1Bar = cnd1Bar * sign * NormalDistribution.value(sign*d1) +d2Bar
+    val sqrtVarBar = -d2Bar + d1Bar*(0.5-log/(sqrtVar*sqrtVar))
+    val logBar = d1Bar/sqrtVar
+    val forwardBar =logBar/forward + priceBar*sign * discountFactor * cnd1
+    val vm1Bar = sqrtVarBar*sqrtvm2
+    val sqrtvm2Bar = sqrtVarBar*vm1
+    val vm2Bar = sqrtvm2Bar*0.5/sqrtvm2
+    val vm0Bar = forwardBar*cf
+    val cfBar = forwardBar*vm0
+    val vm3Bar = cfBar*vm4*cf
+    val vm4Bar = cfBar*vm3*cf
+
+
+    for (measure <- measures) {
+      measure match {
+        case Price() =>
+          measure.value = price
+        case DeltaGreek() =>
+          measure.value = vm0Bar
+        case VegaGreek() =>
+          measure.value = vm1Bar
+        case RhoGreek() => measure.value = vm5Bar
+        case Rho2Greek() => measure.value = vm3Bar
+        case ThetaGreek() => measure.value = vm2Bar + vm4Bar + vm6Bar
+      }
+    }
+  }
   def priceEuropeanVanilla(
     isCall: Boolean,
     strike: Double,
@@ -58,7 +134,7 @@ object BlackScholesVanillaEuropean {
 
     for (measure <- measures) {
       measure match {
-        case Price() => 
+        case Price() =>
           measure.value = sign * discountDf * (forward * cnd1 - strike * cnd2)
         case GammaGreek() =>
           val nd1 = NormalDistribution.value(d1)

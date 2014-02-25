@@ -1,6 +1,8 @@
 package quantscale.math
 
-//solve y'(x)=f(x,y(x))
+/**
+ * solve y'(x)=f(x,y(x))
+ */
 
 class RungeKuttaODESolver {
 
